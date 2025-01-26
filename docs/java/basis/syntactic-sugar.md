@@ -1,12 +1,12 @@
 ---
-title:  Java 语法糖详解
+title: Java 语法糖详解
 category: Java
 tag:
   - Java基础
 head:
   - - meta
     - name: keywords
-      content:  Java 语法糖
+      content: Java 语法糖
   - - meta
     - name: description
       content: 这篇文章介绍了 12 种 Java 中常用的语法糖。所谓语法糖就是提供给开发人员便于开发的一种语法而已。但是这种语法只有开发人员认识。要想被执行，需要进行解糖，即转成 JVM 认识的语法。当我们把语法糖解糖之后，你就会发现其实我们日常使用的这些方便的语法，其实都是一些其他更简单的语法构成的。有了这些语法糖，我们在日常开发的时候可以大大提升效率，但是同时也要避免过渡使用。使用之前最好了解下原理，避免掉坑。
@@ -14,8 +14,7 @@ head:
 
 > 作者：Hollis
 >
-> 原文：https://mp.weixin.qq.com/s/o4XdEMq1DL-nBS-f8Za5Aw
->
+> 原文：<https://mp.weixin.qq.com/s/o4XdEMq1DL-nBS-f8Za5Aw>
 
 语法糖是大厂 Java 面试常问的一个知识点。
 
@@ -47,7 +46,7 @@ Java 中最常用的语法糖主要有泛型、变长参数、条件编译、自
 
 在开始之前先科普下，Java 中的`switch`自身原本就支持基本类型。比如`int`、`char`等。对于`int`类型，直接进行数值的比较。对于`char`类型则是比较其 ascii 码。所以，对于编译器来说，`switch`中其实只能使用整型，任何类型的比较都要转换成整型。比如`byte`。`short`，`char`(ascii 码是整型)以及`int`。
 
-那么接下来看下`switch`对`String`得支持，有以下代码：
+那么接下来看下`switch`对`String`的支持，有以下代码：
 
 ```java
 public class switchDemoString {
@@ -108,7 +107,7 @@ public class switchDemoString
 
 也就是说，**对于 Java 虚拟机来说，他根本不认识`Map<String, String> map`这样的语法。需要在编译阶段通过类型擦除的方式进行解语法糖。**
 
-类型擦除的主要过程如下： 1.将所有的泛型参数用其最左边界（最顶级的父类型）类型替换。 2.移除所有的类型参数。
+类型擦除的主要过程如下：1.将所有的泛型参数用其最左边界（最顶级的父类型）类型替换。 2.移除所有的类型参数。
 
 以下代码：
 
@@ -247,7 +246,7 @@ public static transient void print(String strs[])
 }
 ```
 
-从反编译后代码可以看出，可变参数在被使用的时候，他首先会创建一个数组，数组的长度就是调用该方法是传递的实参的个数，然后再把参数值全部放到这个数组当中，然后再把这个数组作为参数传递到被调用的方法中。
+从反编译后代码可以看出，可变参数在被使用的时候，他首先会创建一个数组，数组的长度就是调用该方法是传递的实参的个数，然后再把参数值全部放到这个数组当中，然后再把这个数组作为参数传递到被调用的方法中。（注：`trasient` 仅在修饰成员变量时有意义，此处 “修饰方法” 是由于在 javassist 中使用相同数值分别表示 `trasient` 以及 `vararg`，见 [此处](https://github.com/jboss-javassist/javassist/blob/7302b8b0a09f04d344a26ebe57f29f3db43f2a3e/src/main/javassist/bytecode/AccessFlag.java#L32)。）
 
 ### 枚举
 
@@ -338,7 +337,7 @@ public class OutterClass {
 }
 ```
 
-以上代码编译后会生成两个 class 文件：`OutterClass$InnerClass.class` 、`OutterClass.class` 。当我们尝试对`OutterClass.class`文件进行反编译的时候，命令行会打印以下内容：`Parsing OutterClass.class...Parsing inner class OutterClass$InnerClass.class... Generating OutterClass.jad` 。他会把两个文件全部进行反编译，然后一起生成一个`OutterClass.jad`文件。文件内容如下：
+以上代码编译后会生成两个 class 文件：`OutterClass$InnerClass.class`、`OutterClass.class` 。当我们尝试对`OutterClass.class`文件进行反编译的时候，命令行会打印以下内容：`Parsing OutterClass.class...Parsing inner class OutterClass$InnerClass.class... Generating OutterClass.jad` 。他会把两个文件全部进行反编译，然后一起生成一个`OutterClass.jad`文件。文件内容如下：
 
 ```java
 public class OutterClass
@@ -378,6 +377,83 @@ public class OutterClass
     }
     private String userName;
 }
+```
+
+**为什么内部类可以使用外部类的 private 属性**：
+
+我们在 InnerClass 中增加一个方法，打印外部类的 userName 属性
+
+```java
+//省略其他属性
+public class OutterClass {
+    private String userName;
+    ......
+    class InnerClass{
+    ......
+        public void printOut(){
+            System.out.println("Username from OutterClass:"+userName);
+        }
+    }
+}
+
+// 此时，使用javap -p命令对OutterClass反编译结果：
+public classOutterClass {
+    private String userName;
+    ......
+    static String access$000(OutterClass);
+}
+// 此时，InnerClass的反编译结果：
+class OutterClass$InnerClass {
+    final OutterClass this$0;
+    ......
+    public void printOut();
+}
+
+```
+
+实际上，在编译完成之后，inner 实例内部会有指向 outer 实例的引用`this$0`，但是简单的`outer.name`是无法访问 private 属性的。从反编译的结果可以看到，outer 中会有一个桥方法`static String access$000(OutterClass)`，恰好返回 String 类型，即 userName 属性。正是通过这个方法实现内部类访问外部类私有属性。所以反编译后的`printOut()`方法大致如下：
+
+```java
+public void printOut() {
+    System.out.println("Username from OutterClass:" + OutterClass.access$000(this.this$0));
+}
+```
+
+补充：
+
+1. 匿名内部类、局部内部类、静态内部类也是通过桥方法来获取 private 属性。
+2. 静态内部类没有`this$0`的引用
+3. 匿名内部类、局部内部类通过复制使用局部变量，该变量初始化之后就不能被修改。以下是一个案例：
+
+```java
+public class OutterClass {
+    private String userName;
+
+    public void test(){
+        //这里i初始化为1后就不能再被修改
+        int i=1;
+        class Inner{
+            public void printName(){
+                System.out.println(userName);
+                System.out.println(i);
+            }
+        }
+    }
+}
+```
+
+反编译后：
+
+```java
+//javap命令反编译Inner的结果
+//i被复制进内部类，且为final
+class OutterClass$1Inner {
+  final int val$i;
+  final OutterClass this$0;
+  OutterClass$1Inner();
+  public void printName();
+}
+
 ```
 
 ### 条件编译
@@ -424,7 +500,7 @@ public class ConditionalCompilation
 
 首先，我们发现，在反编译后的代码中没有`System.out.println("Hello, ONLINE!");`，这其实就是条件编译。当`if(ONLINE)`为 false 的时候，编译器就没有对其内的代码进行编译。
 
-所以，**Java 语法的条件编译，是通过判断条件为常量的 if 语句实现的。其原理也是 Java 语言的语法糖。根据 if 判断条件的真假，编译器直接把分支为 false 的代码块消除。通过该方式实现的条件编译，必须在方法体内实现，而无法在正整个 Java 类的结构或者类的属性上进行条件编译，这与 C/C++的条件编译相比，确实更有局限性。在 Java 语言设计之初并没有引入条件编译的功能，虽有局限，但是总比没有更强。**
+所以，**Java 语法的条件编译，是通过判断条件为常量的 if 语句实现的。其原理也是 Java 语言的语法糖。根据 if 判断条件的真假，编译器直接把分支为 false 的代码块消除。通过该方式实现的条件编译，必须在方法体内实现，而无法在整个 Java 类的结构或者类的属性上进行条件编译，这与 C/C++的条件编译相比，确实更有局限性。在 Java 语言设计之初并没有引入条件编译的功能，虽有局限，但是总比没有更强。**
 
 ### 断言
 
@@ -759,7 +835,8 @@ class GT<T>{
 
 以上代码输出结果为：2！
 
-由于经过类型擦除，所有的泛型类实例都关联到同一份字节码上，泛型类的所有静态变量是共享的。
+有些同学可能会误认为泛型类是不同的类，对应不同的字节码，其实
+由于经过类型擦除，所有的泛型类实例都关联到同一份字节码上，泛型类的静态变量是共享的。上面例子里的`GT<Integer>.var`和`GT<String>.var`其实是一个变量。
 
 ### 自动装箱与拆箱
 
@@ -778,7 +855,7 @@ public static void main(String[] args) {
 
 输出结果：
 
-```
+```plain
 a == b is false
 c == d is true
 ```
@@ -809,3 +886,5 @@ Iterator 是工作在一个独立的线程中，并且拥有一个 mutex 锁。 
 前面介绍了 12 种 Java 中常用的语法糖。所谓语法糖就是提供给开发人员便于开发的一种语法而已。但是这种语法只有开发人员认识。要想被执行，需要进行解糖，即转成 JVM 认识的语法。当我们把语法糖解糖之后，你就会发现其实我们日常使用的这些方便的语法，其实都是一些其他更简单的语法构成的。
 
 有了这些语法糖，我们在日常开发的时候可以大大提升效率，但是同时也要避过度使用。使用之前最好了解下原理，避免掉坑。
+
+<!-- @include: @article-footer.snippet.md -->

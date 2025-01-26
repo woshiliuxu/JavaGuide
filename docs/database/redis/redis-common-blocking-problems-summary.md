@@ -5,15 +5,28 @@ tag:
   - Redis
 ---
 
-> 本文整理完善自：https://mp.weixin.qq.com/s/0Nqfq_eQrUb12QH6eBbHXA ，作者：阿Q说代码
+> 本文整理完善自：<https://mp.weixin.qq.com/s/0Nqfq_eQrUb12QH6eBbHXA> ，作者：阿 Q 说代码
 
 这篇文章会详细总结一下可能导致 Redis 阻塞的情况，这些情况也是影响 Redis 性能的关键因素，使用 Redis 的时候应该格外注意！
 
 ## O(n) 命令
 
-使用` O(n)` 命令可能会导致阻塞，例如`keys *` 、`hgetall`、`lrange`、`smembers`、`zrange`、`sinter` 、`sunion` 命令。这些命令时间复杂度是 O(n)，有时候也会全表扫描，随着 n 的增大耗时也会越大从而导致客户端阻塞。
+Redis 中的大部分命令都是 O(1)时间复杂度，但也有少部分 O(n) 时间复杂度的命令，例如：
 
-不过， 这些命令并不是一定不能使用，但是需要明确 N 的值。有遍历的需求可以使用 `hscan`、`sscan`、`zscan` 代替。
+- `KEYS *`：会返回所有符合规则的 key。
+- `HGETALL`：会返回一个 Hash 中所有的键值对。
+- `LRANGE`：会返回 List 中指定范围内的元素。
+- `SMEMBERS`：返回 Set 中的所有元素。
+- `SINTER`/`SUNION`/`SDIFF`：计算多个 Set 的交集/并集/差集。
+- ……
+
+由于这些命令时间复杂度是 O(n)，有时候也会全表扫描，随着 n 的增大，执行耗时也会越长，从而导致客户端阻塞。不过， 这些命令并不是一定不能使用，但是需要明确 N 的值。另外，有遍历的需求可以使用 `HSCAN`、`SSCAN`、`ZSCAN` 代替。
+
+除了这些 O(n)时间复杂度的命令可能会导致阻塞之外， 还有一些时间复杂度可能在 O(N) 以上的命令，例如：
+
+- `ZRANGE`/`ZREVRANGE`：返回指定 Sorted Set 中指定排名范围内的所有元素。时间复杂度为 O(log(n)+m)，n 为所有元素的数量， m 为返回的元素数量，当 m 和 n 相当大时，O(n) 的时间复杂度更小。
+- `ZREMRANGEBYRANK`/`ZREMRANGEBYSCORE`：移除 Sorted Set 中指定排名范围/指定 score 范围内的所有元素。时间复杂度为 O(log(n)+m)，n 为所有元素的数量， m 被删除元素的数量，当 m 和 n 相当大时，O(n) 的时间复杂度更小。
+- ……
 
 ## SAVE 创建 RDB 快照
 
@@ -49,12 +62,12 @@ Redis AOF 持久化机制是在执行完命令之后再记录日志，这和关�
 在 Redis 的配置文件中存在三种不同的 AOF 持久化方式（ `fsync`策略），它们分别是：
 
 1. `appendfsync always`：主线程调用 `write` 执行写操作后，后台线程（ `aof_fsync` 线程）立即会调用 `fsync` 函数同步 AOF 文件（刷盘），`fsync` 完成后线程返回，这样会严重降低 Redis 的性能（`write` + `fsync`）。
-2. `appendfsync everysec` ：主线程调用 `write` 执行写操作后立即返回，由后台线程（ `aof_fsync` 线程）每秒钟调用 `fsync` 函数（系统调用）同步一次 AOF 文件（`write`+`fsync`，`fsync`间隔为 1 秒）
-3. `appendfsync no` ：主线程调用 `write` 执行写操作后立即返回，让操作系统决定何时进行同步，Linux 下一般为 30 秒一次（`write`但不`fsync`，`fsync` 的时机由操作系统决定）。
+2. `appendfsync everysec`：主线程调用 `write` 执行写操作后立即返回，由后台线程（ `aof_fsync` 线程）每秒钟调用 `fsync` 函数（系统调用）同步一次 AOF 文件（`write`+`fsync`，`fsync`间隔为 1 秒）
+3. `appendfsync no`：主线程调用 `write` 执行写操作后立即返回，让操作系统决定何时进行同步，Linux 下一般为 30 秒一次（`write`但不`fsync`，`fsync` 的时机由操作系统决定）。
 
 当后台线程（ `aof_fsync` 线程）调用 `fsync` 函数同步 AOF 文件时，需要等待，直到写入完成。当磁盘压力太大的时候，会导致 `fsync` 操作发生阻塞，主线程调用 `write` 函数时也会被阻塞。`fsync` 完成后，主线程执行 `write` 才能成功返回。
 
-关于 AOF 工作流程的详细介绍可以查看：[Redis持久化机制详解](./redis-persistence.md)，有助于理解 AOF 刷盘阻塞。
+关于 AOF 工作流程的详细介绍可以查看：[Redis 持久化机制详解](./redis-persistence.md)，有助于理解 AOF 刷盘阻塞。
 
 ### AOF 重写阻塞
 
@@ -64,11 +77,14 @@ Redis AOF 持久化机制是在执行完命令之后再记录日志，这和关�
 
 阻塞就是出现在第 2 步的过程中，将缓冲区中新数据写到新文件的过程中会产生**阻塞**。
 
-相关阅读：[Redis AOF重写阻塞问题分析](https://cloud.tencent.com/developer/article/1633077)。
+相关阅读：[Redis AOF 重写阻塞问题分析](https://cloud.tencent.com/developer/article/1633077)。
 
 ## 大 Key
 
-如果一个 key 对应的 value 所占用的内存比较大，那这个 key 就可以看作是 bigkey。具体多大才算大呢？有一个不是特别精确的参考标准：string 类型的 value 超过 10 kb，复合类型的 value 包含的元素超过 5000 个（对于复合类型的 value 来说，不一定包含的元素越多，占用的内存就越多）。
+如果一个 key 对应的 value 所占用的内存比较大，那这个 key 就可以看作是 bigkey。具体多大才算大呢？有一个不是特别精确的参考标准：
+
+- string 类型的 value 超过 1MB
+- 复合类型（列表、哈希、集合、有序集合等）的 value 包含的元素超过 5000 个（对于复合类型的 value 来说，不一定包含的元素越多，占用的内存就越多）。
 
 大 key 造成的阻塞问题如下：
 
@@ -111,16 +127,16 @@ Redis 集群可以进行节点的动态扩容缩容，这一过程目前还处�
 
 ## Swap（内存交换）
 
-什么是 Swap？Swap 直译过来是交换的意思，Linux中的Swap常被称为内存交换或者交换分区。类似于 Windows 中的虚拟内存，就是当内存不足的时候，把一部分硬盘空间虚拟成内存使用，从而解决内存容量不足的情况。因此，Swap 分区的作用就是牺牲硬盘，增加内存，解决 VPS 内存不够用或者爆满的问题。
+**什么是 Swap？** Swap 直译过来是交换的意思，Linux 中的 Swap 常被称为内存交换或者交换分区。类似于 Windows 中的虚拟内存，就是当内存不足的时候，把一部分硬盘空间虚拟成内存使用，从而解决内存容量不足的情况。因此，Swap 分区的作用就是牺牲硬盘，增加内存，解决 VPS 内存不够用或者爆满的问题。
 
-Swap 对于Redis来说是非常致命的，Redis保证高性能的一个重要前提是所有的数据在内存中。如果操作系统把Redis使用的部分内存换出硬盘，由于内存与硬盘读写的速度并几个数量级，会导致发生交换后的Redis性能急剧下降。
+Swap 对于 Redis 来说是非常致命的，Redis 保证高性能的一个重要前提是所有的数据在内存中。如果操作系统把 Redis 使用的部分内存换出硬盘，由于内存与硬盘的读写速度差几个数量级，会导致发生交换后的 Redis 性能急剧下降。
 
 识别 Redis 发生 Swap 的检查方法如下：
 
-1、查询Redis进程号
+1、查询 Redis 进程号
 
 ```bash
-reids-cli -p 6383 info server | grep process_id
+redis-cli -p 6383 info server | grep process_id
 process_id: 4476
 ```
 
@@ -136,19 +152,19 @@ Swap: 0kB
 .....
 ```
 
-如果交换量都是0KB或者个别的是4KB，则正常。
+如果交换量都是 0KB 或者个别的是 4KB，则正常。
 
 预防内存交换的方法：
 
 - 保证机器充足的可用内存
-- 确保所有Redis实例设置最大可用内存(maxmemory)，防止极端情况Redis内存不可控的增长
-- 降低系统使用swap优先级，如`echo 10 > /proc/sys/vm/swappiness`
+- 确保所有 Redis 实例设置最大可用内存(maxmemory)，防止极端情况 Redis 内存不可控的增长
+- 降低系统使用 swap 优先级，如`echo 10 > /proc/sys/vm/swappiness`
 
 ## CPU 竞争
 
-Redis是典型的CPU密集型应用，不建议和其他多核CPU密集型服务部署在一起。当其他进程过度消耗CPU时，将严重影响Redis的吞吐量。
+Redis 是典型的 CPU 密集型应用，不建议和其他多核 CPU 密集型服务部署在一起。当其他进程过度消耗 CPU 时，将严重影响 Redis 的吞吐量。
 
-可以通过`reids-cli --stat`获取当前Redis使用情况。通过`top`命令获取进程对CPU的利用率等信息 通过`info commandstats`统计信息分析出命令不合理开销时间，查看是否是因为高算法复杂度或者过度的内存优化问题。
+可以通过`redis-cli --stat`获取当前 Redis 使用情况。通过`top`命令获取进程对 CPU 的利用率等信息 通过`info commandstats`统计信息分析出命令不合理开销时间，查看是否是因为高算法复杂度或者过度的内存优化问题。
 
 ## 网络问题
 
@@ -156,5 +172,7 @@ Redis是典型的CPU密集型应用，不建议和其他多核CPU密集型服务
 
 ## 参考
 
-- Redis阻塞的6大类场景分析与总结：https://mp.weixin.qq.com/s/eaZCEtTjTuEmXfUubVHjew
-- Redis开发与运维笔记-Redis的噩梦-阻塞：https://mp.weixin.qq.com/s/TDbpz9oLH6ifVv6ewqgSgA
+- Redis 阻塞的 6 大类场景分析与总结：<https://mp.weixin.qq.com/s/eaZCEtTjTuEmXfUubVHjew>
+- Redis 开发与运维笔记-Redis 的噩梦-阻塞：<https://mp.weixin.qq.com/s/TDbpz9oLH6ifVv6ewqgSgA>
+
+<!-- @include: @article-footer.snippet.md -->

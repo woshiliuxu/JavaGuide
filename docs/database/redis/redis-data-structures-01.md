@@ -1,30 +1,30 @@
 ---
-title: Redis 5 种基本数据结构详解
+title: Redis 5 种基本数据类型详解
 category: 数据库
 tag:
   - Redis
 head:
   - - meta
     - name: keywords
-      content: Redis常见数据结构
+      content: Redis常见数据类型
   - - meta
     - name: description
-      content: Redis基础数据结构总结：String（字符串）、List（列表）、Set（集合）、Hash（散列）、Zset（有序集合）
+      content: Redis基础数据类型总结：String（字符串）、List（列表）、Set（集合）、Hash（散列）、Zset（有序集合）
 ---
 
-Redis 共有 5 种基本数据结构：String（字符串）、List（列表）、Set（集合）、Hash（散列）、Zset（有序集合）。
+Redis 共有 5 种基本数据类型：String（字符串）、List（列表）、Set（集合）、Hash（散列）、Zset（有序集合）。
 
-这 5 种数据结构是直接提供给用户使用的，是数据的保存形式，其底层实现主要依赖这 8 种数据结构：简单动态字符串（SDS）、LinkedList（双向链表）、Hash Table（哈希表）、SkipList（跳跃表）、Intset（整数集合）、ZipList（压缩列表）、QuickList（快速列表）。
+这 5 种数据类型是直接提供给用户使用的，是数据的保存形式，其底层实现主要依赖这 8 种数据结构：简单动态字符串（SDS）、LinkedList（双向链表）、Dict（哈希表/字典）、SkipList（跳跃表）、Intset（整数集合）、ZipList（压缩列表）、QuickList（快速列表）。
 
-Redis 基本数据结构的底层数据结构实现如下：
+Redis 5 种基本数据类型对应的底层数据结构实现如下表所示：
 
-| String | List                         | Hash                | Set             | Zset              |
-| :----- | :--------------------------- | :------------------ | :-------------- | :---------------- |
-| SDS    | LinkedList/ZipList/QuickList | Hash Table、ZipList | ZipList、Intset | ZipList、SkipList |
+| String | List                         | Hash          | Set          | Zset              |
+| :----- | :--------------------------- | :------------ | :----------- | :---------------- |
+| SDS    | LinkedList/ZipList/QuickList | Dict、ZipList | Dict、Intset | ZipList、SkipList |
 
-Redis 3.2 之前，List 底层实现是 LinkedList 或者 ZipList。 Redis 3.2 之后，引入了 LinkedList 和 ZipList 的结合 QuickList，List 的底层实现变为 QuickList。
+Redis 3.2 之前，List 底层实现是 LinkedList 或者 ZipList。 Redis 3.2 之后，引入了 LinkedList 和 ZipList 的结合 QuickList，List 的底层实现变为 QuickList。从 Redis 7.0 开始， ZipList 被 ListPack 取代。
 
-你可以在 Redis 官网上找到 Redis 数据结构非常详细的介绍：
+你可以在 Redis 官网上找到 Redis 数据类型/结构非常详细的介绍：
 
 - [Redis Data Structures](https://redis.com/redis-enterprise/data-structures/)
 - [Redis Data types tutorial](https://redis.io/docs/manual/data-types/data-types-tutorial/)
@@ -37,9 +37,9 @@ Redis 3.2 之前，List 底层实现是 LinkedList 或者 ZipList。 Redis 3.2 �
 
 ### 介绍
 
-String 是 Redis 中最简单同时也是最常用的一个数据结构。
+String 是 Redis 中最简单同时也是最常用的一个数据类型。
 
-String 是一种二进制安全的数据结构，可以用来存储任何类型的数据比如字符串、整数、浮点数、图片（图片的 base64 编码或者解码或者图片的路径）、序列化后的对象。
+String 是一种二进制安全的数据类型，可以用来存储任何类型的数据比如字符串、整数、浮点数、图片（图片的 base64 编码或者解码或者图片的路径）、序列化后的对象。
 
 ![](https://oss.javaguide.cn/github/javaguide/database/redis/image-20220719124403897.png)
 
@@ -47,23 +47,23 @@ String 是一种二进制安全的数据结构，可以用来存储任何类型�
 
 ### 常用命令
 
-| 命令                           | 介绍                             |
-| ------------------------------ | -------------------------------- |
-| SET key value                  | 设置指定 key 的值                |
-| SETNX key value                | 只有在 key 不存在时设置 key 的值 |
-| GET key                        | 获取指定 key 的值                |
-| MSET key1 value1 key2 value2 … | 设置一个或多个指定 key 的值      |
-| MGET key1 key2 ...             | 获取一个或多个指定 key 的值      |
-| STRLEN key                     | 返回 key 所储存的字符串值的长度  |
-| INCR key                       | 将 key 中储存的数字值增一        |
-| DECR key                       | 将 key 中储存的数字值减一        |
-| EXISTS key                     | 判断指定 key 是否存在            |
-| DEL key（通用）                | 删除指定的 key                   |
-| EXPIRE key seconds（通用）     | 给指定 key 设置过期时间          |
+| 命令                            | 介绍                             |
+| ------------------------------- | -------------------------------- |
+| SET key value                   | 设置指定 key 的值                |
+| SETNX key value                 | 只有在 key 不存在时设置 key 的值 |
+| GET key                         | 获取指定 key 的值                |
+| MSET key1 value1 key2 value2 …… | 设置一个或多个指定 key 的值      |
+| MGET key1 key2 ...              | 获取一个或多个指定 key 的值      |
+| STRLEN key                      | 返回 key 所储存的字符串值的长度  |
+| INCR key                        | 将 key 中储存的数字值增一        |
+| DECR key                        | 将 key 中储存的数字值减一        |
+| EXISTS key                      | 判断指定 key 是否存在            |
+| DEL key（通用）                 | 删除指定的 key                   |
+| EXPIRE key seconds（通用）      | 给指定 key 设置过期时间          |
 
-更多 Redis String 命令以及详细使用指南，请查看 Redis 官网对应的介绍：https://redis.io/commands/?group=string 。
+更多 Redis String 命令以及详细使用指南，请查看 Redis 官网对应的介绍：<https://redis.io/commands/?group=string> 。
 
-**基本操作** ：
+**基本操作**：
 
 ```bash
 > SET key value
@@ -80,7 +80,7 @@ OK
 (nil)
 ```
 
-**批量设置** ：
+**批量设置**：
 
 ```bash
 > MSET key1 value1 key2 value2
@@ -110,7 +110,7 @@ OK
 ```bash
 > EXPIRE key 60
 (integer) 1
-> SETNX key 60 value # 设置值并设置过期时间
+> SETEX key 60 value # 设置值并设置过期时间
 OK
 > TTL key
 (integer) 56
@@ -120,13 +120,13 @@ OK
 
 **需要存储常规数据的场景**
 
-- 举例 ：缓存 session、token、图片地址、序列化后的对象(相比较于 Hash 存储更节省内存)。
-- 相关命令 ： `SET`、`GET`。
+- 举例：缓存 Session、Token、图片地址、序列化后的对象(相比较于 Hash 存储更节省内存)。
+- 相关命令：`SET`、`GET`。
 
 **需要计数的场景**
 
-- 举例 ：用户单位时间的请求数（简单限流可以用到）、页面单位时间的访问数。
-- 相关命令 ：`SET`、`GET`、 `INCR`、`DECR` 。
+- 举例：用户单位时间的请求数（简单限流可以用到）、页面单位时间的访问数。
+- 相关命令：`SET`、`GET`、 `INCR`、`DECR` 。
 
 **分布式锁**
 
@@ -154,9 +154,9 @@ Redis 中的 List 其实就是链表数据结构的实现。我在 [线性数据
 | LLEN key                    | 获取列表元素数量                           |
 | LRANGE key start end        | 获取列表 start 和 end 之间 的元素          |
 
-更多 Redis List 命令以及详细使用指南，请查看 Redis 官网对应的介绍：https://redis.io/commands/?group=list 。
+更多 Redis List 命令以及详细使用指南，请查看 Redis 官网对应的介绍：<https://redis.io/commands/?group=list> 。
 
-**通过 `RPUSH/LPOP` 或者 `LPUSH/RPOP`实现队列** ：
+**通过 `RPUSH/LPOP` 或者 `LPUSH/RPOP`实现队列**：
 
 ```bash
 > RPUSH myList value1
@@ -173,12 +173,12 @@ Redis 中的 List 其实就是链表数据结构的实现。我在 [线性数据
 2) "value3"
 ```
 
-**通过 `RPUSH/RPOP`或者`LPUSH/LPOP` 实现栈** ：
+**通过 `RPUSH/RPOP`或者`LPUSH/LPOP` 实现栈**：
 
 ```bash
 > RPUSH myList2 value1 value2 value3
 (integer) 3
-> RPOP myList2 # 将 list的头部(最右边)元素取出
+> RPOP myList2 # 将 list的最右边的元素取出
 "value3"
 ```
 
@@ -186,7 +186,7 @@ Redis 中的 List 其实就是链表数据结构的实现。我在 [线性数据
 
 ![](https://oss.javaguide.cn/github/javaguide/database/redis/redis-list.png)
 
-**通过 `LRANGE` 查看对应下标范围的列表元素** ：
+**通过 `LRANGE` 查看对应下标范围的列表元素**：
 
 ```bash
 > RPUSH myList value1 value2 value3
@@ -202,7 +202,7 @@ Redis 中的 List 其实就是链表数据结构的实现。我在 [线性数据
 
 通过 `LRANGE` 命令，你可以基于 List 实现分页查询，性能非常高！
 
-**通过 `LLEN` 查看链表长度** ：
+**通过 `LLEN` 查看链表长度**：
 
 ```bash
 > LLEN myList
@@ -213,12 +213,12 @@ Redis 中的 List 其实就是链表数据结构的实现。我在 [线性数据
 
 **信息流展示**
 
-- 举例 ：最新文章、最新动态。
-- 相关命令 ： `LPUSH`、`LRANGE`。
+- 举例：最新文章、最新动态。
+- 相关命令：`LPUSH`、`LRANGE`。
 
 **消息队列**
 
-Redis List 数据结构可以用来做消息队列，只是功能过于简单且存在很多缺陷，不建议这样做。
+`List` 可以用来做消息队列，只是功能过于简单且存在很多缺陷，不建议这样做。
 
 相对来说，Redis 5.0 新增加的一个数据结构 `Stream` 更适合做消息队列一些，只是功能依然非常简陋。和专业的消息队列相比，还是有很多欠缺的地方比如消息丢失和堆积问题不好解决。
 
@@ -247,9 +247,9 @@ Hash 类似于 JDK1.8 前的 `HashMap`，内部实现也差不多(数组 + 链�
 | HLEN key                                  | 获取指定哈希表中字段的数量                               |
 | HINCRBY key field increment               | 对指定哈希中的指定字段做运算操作（正数为加，负数为减）   |
 
-更多 Redis Hash 命令以及详细使用指南，请查看 Redis 官网对应的介绍：https://redis.io/commands/?group=hash 。
+更多 Redis Hash 命令以及详细使用指南，请查看 Redis 官网对应的介绍：<https://redis.io/commands/?group=hash> 。
 
-**模拟对象数据存储** ：
+**模拟对象数据存储**：
 
 ```bash
 > HMSET userInfoKey name "guide" description "dev" age 24
@@ -278,8 +278,8 @@ OK
 
 **对象数据存储场景**
 
-- 举例 ：用户信息、商品信息、文章信息、购物车信息。
-- 相关命令 ：`HSET` （设置单个字段的值）、`HMSET`（设置多个字段的值）、`HGET`（获取单个字段的值）、`HMGET`（获取多个字段的值）。
+- 举例：用户信息、商品信息、文章信息、购物车信息。
+- 相关命令：`HSET` （设置单个字段的值）、`HMSET`（设置多个字段的值）、`HGET`（获取单个字段的值）、`HMGET`（获取多个字段的值）。
 
 ## Set（集合）
 
@@ -308,9 +308,9 @@ Redis 中的 Set 类型是一种无序集合，集合中的元素没有先后顺
 | SPOP key count                        | 随机移除并获取指定集合中一个或多个元素    |
 | SRANDMEMBER key count                 | 随机获取指定集合中指定数量的元素          |
 
-更多 Redis Set 命令以及详细使用指南，请查看 Redis 官网对应的介绍：https://redis.io/commands/?group=set 。
+更多 Redis Set 命令以及详细使用指南，请查看 Redis 官网对应的介绍：<https://redis.io/commands/?group=set> 。
 
-**基本操作** ：
+**基本操作**：
 
 ```bash
 > SADD mySet value1 value2
@@ -329,9 +329,9 @@ Redis 中的 Set 类型是一种无序集合，集合中的元素没有先后顺
 ```
 
 - `mySet` : `value1`、`value2` 。
-- `mySet2` ： `value2` 、`value3` 。
+- `mySet2`：`value2`、`value3` 。
 
-**求交集** ：
+**求交集**：
 
 ```bash
 > SINTERSTORE mySet3 mySet mySet2
@@ -340,7 +340,7 @@ Redis 中的 Set 类型是一种无序集合，集合中的元素没有先后顺
 1) "value2"
 ```
 
-**求并集** ：
+**求并集**：
 
 ```bash
 > SUNION mySet mySet2
@@ -349,7 +349,7 @@ Redis 中的 Set 类型是一种无序集合，集合中的元素没有先后顺
 3) "value1"
 ```
 
-**求差集** ：
+**求差集**：
 
 ```bash
 > SDIFF mySet mySet2 # 差集是由所有属于 mySet 但不属于 A 的元素组成的集合
@@ -367,14 +367,14 @@ Redis 中的 Set 类型是一种无序集合，集合中的元素没有先后顺
 
 **需要获取多个数据源交集、并集和差集的场景**
 
-- 举例 ：共同好友(交集)、共同粉丝(交集)、共同关注(交集)、好友推荐（差集）、音乐推荐（差集） 、订阅号推荐（差集+交集） 等场景。
+- 举例：共同好友(交集)、共同粉丝(交集)、共同关注(交集)、好友推荐（差集）、音乐推荐（差集）、订阅号推荐（差集+交集） 等场景。
 - 相关命令：`SINTER`（交集）、`SINTERSTORE` （交集）、`SUNION` （并集）、`SUNIONSTORE`（并集）、`SDIFF`（差集）、`SDIFFSTORE` （差集）。
 
 ![](https://oss.javaguide.cn/github/javaguide/database/redis/image-20220719074543513.png)
 
 **需要随机获取数据源中的元素的场景**
 
-- 举例 ：抽奖系统、随机点名等场景。
+- 举例：抽奖系统、随机点名等场景。
 - 相关命令：`SPOP`（随机获取集合中的元素并移除，适合不允许重复中奖的场景）、`SRANDMEMBER`（随机获取集合中的元素，适合允许重复中奖的场景）。
 
 ## Sorted Set（有序集合）
@@ -387,21 +387,21 @@ Sorted Set 类似于 Set，但和 Set 相比，Sorted Set 增加了一个权重�
 
 ### 常用命令
 
-| 命令                                          | 介绍                                                         |
-| --------------------------------------------- | ------------------------------------------------------------ |
-| ZADD key score1 member1 score2 member2 ...    | 向指定有序集合添加一个或多个元素                             |
-| ZCARD KEY                                     | 获取指定有序集合的元素数量                                   |
-| ZSCORE key member                             | 获取指定有序集合中指定元素的 score 值                        |
+| 命令                                          | 介绍                                                                                                          |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| ZADD key score1 member1 score2 member2 ...    | 向指定有序集合添加一个或多个元素                                                                              |
+| ZCARD KEY                                     | 获取指定有序集合的元素数量                                                                                    |
+| ZSCORE key member                             | 获取指定有序集合中指定元素的 score 值                                                                         |
 | ZINTERSTORE destination numkeys key1 key2 ... | 将给定所有有序集合的交集存储在 destination 中，对相同元素对应的 score 值进行 SUM 聚合操作，numkeys 为集合数量 |
-| ZUNIONSTORE destination numkeys key1 key2 ... | 求并集，其它和 ZINTERSTORE 类似                              |
-| ZDIFFSTORE destination numkeys key1 key2 ...  | 求差集，其它和 ZINTERSTORE 类似                              |
-| ZRANGE key start end                          | 获取指定有序集合 start 和 end 之间的元素（score 从低到高）   |
-| ZREVRANGE key start end                       | 获取指定有序集合 start 和 end 之间的元素（score 从高到底）   |
-| ZREVRANK key member                           | 获取指定有序集合中指定元素的排名(score 从大到小排序)         |
+| ZUNIONSTORE destination numkeys key1 key2 ... | 求并集，其它和 ZINTERSTORE 类似                                                                               |
+| ZDIFFSTORE destination numkeys key1 key2 ...  | 求差集，其它和 ZINTERSTORE 类似                                                                               |
+| ZRANGE key start end                          | 获取指定有序集合 start 和 end 之间的元素（score 从低到高）                                                    |
+| ZREVRANGE key start end                       | 获取指定有序集合 start 和 end 之间的元素（score 从高到底）                                                    |
+| ZREVRANK key member                           | 获取指定有序集合中指定元素的排名(score 从大到小排序)                                                          |
 
-更多 Redis Sorted Set 命令以及详细使用指南，请查看 Redis 官网对应的介绍：https://redis.io/commands/?group=sorted-set 。
+更多 Redis Sorted Set 命令以及详细使用指南，请查看 Redis 官网对应的介绍：<https://redis.io/commands/?group=sorted-set> 。
 
-**基本操作** ：
+**基本操作**：
 
 ```bash
 > ZADD myZset 2.0 value1 1.0 value2
@@ -422,9 +422,9 @@ Sorted Set 类似于 Set，但和 Set 相比，Sorted Set 增加了一个权重�
 ```
 
 - `myZset` : `value1`(2.0)、`value2`(1.0) 。
-- `myZset2` ： `value2` （4.0）、`value3`(3.0) 。
+- `myZset2`：`value2` （4.0）、`value3`(3.0) 。
 
-**获取指定元素的排名** ：
+**获取指定元素的排名**：
 
 ```bash
 > ZREVRANK myZset value1
@@ -433,7 +433,7 @@ Sorted Set 类似于 Set，但和 Set 相比，Sorted Set 增加了一个权重�
 1
 ```
 
-**求交集** ：
+**求交集**：
 
 ```bash
 > ZINTERSTORE myZset3 2 myZset myZset2
@@ -443,7 +443,7 @@ value2
 5
 ```
 
-**求并集** ：
+**求并集**：
 
 ```bash
 > ZUNIONSTORE myZset4 2 myZset myZset2
@@ -457,7 +457,7 @@ value2
 5
 ```
 
-**求差集** ：
+**求差集**：
 
 ```bash
 > ZDIFF 2 myZset myZset2 WITHSCORES
@@ -469,23 +469,35 @@ value1
 
 **需要随机获取数据源中的元素根据某个权重进行排序的场景**
 
-- 举例 ：各种排行榜比如直播间送礼物的排行榜、朋友圈的微信步数排行榜、王者荣耀中的段位排行榜、话题热度排行榜等等。
-- 相关命令 ：`ZRANGE` (从小到大排序) 、 `ZREVRANGE` （从大到小排序）、`ZREVRANK` (指定元素排名)。
+- 举例：各种排行榜比如直播间送礼物的排行榜、朋友圈的微信步数排行榜、王者荣耀中的段位排行榜、话题热度排行榜等等。
+- 相关命令：`ZRANGE` (从小到大排序)、 `ZREVRANGE` （从大到小排序）、`ZREVRANK` (指定元素排名)。
 
 ![](https://oss.javaguide.cn/github/javaguide/database/redis/2021060714195385.png)
 
-[《Java 面试指北》](https://www.yuque.com/docs/share/f37fc804-bfe6-4b0d-b373-9c462188fec7) 的「技术面试题篇」就有一篇文章详细介绍如何使用 Sorted Set 来设计制作一个排行榜。
+[《Java 面试指北》](https://javaguide.cn/zhuanlan/java-mian-shi-zhi-bei.html) 的「技术面试题篇」就有一篇文章详细介绍如何使用 Sorted Set 来设计制作一个排行榜。
 
 ![](https://oss.javaguide.cn/github/javaguide/database/redis/image-20220719071115140.png)
 
 **需要存储的数据有优先级或者重要程度的场景** 比如优先级任务队列。
 
-- 举例 ：优先级任务队列。
-- 相关命令 ：`ZRANGE` (从小到大排序) 、 `ZREVRANGE` （从大到小排序）、`ZREVRANK` (指定元素排名)。
+- 举例：优先级任务队列。
+- 相关命令：`ZRANGE` (从小到大排序)、 `ZREVRANGE` （从大到小排序）、`ZREVRANK` (指定元素排名)。
+
+## 总结
+
+| 数据类型 | 说明                                                                                                                                                                                           |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| String   | 一种二进制安全的数据类型，可以用来存储任何类型的数据比如字符串、整数、浮点数、图片（图片的 base64 编码或者解码或者图片的路径）、序列化后的对象。                                               |
+| List     | Redis 的 List 的实现为一个双向链表，即可以支持反向查找和遍历，更方便操作，不过带来了部分额外的内存开销。                                                                                       |
+| Hash     | 一个 String 类型的 field-value（键值对） 的映射表，特别适合用于存储对象，后续操作的时候，你可以直接修改这个对象中的某些字段的值。                                                              |
+| Set      | 无序集合，集合中的元素没有先后顺序但都唯一，有点类似于 Java 中的 `HashSet` 。                                                                                                                  |
+| Zset     | 和 Set 相比，Sorted Set 增加了一个权重参数 `score`，使得集合中的元素能够按 `score` 进行有序排列，还可以通过 `score` 的范围来获取元素的列表。有点像是 Java 中 `HashMap` 和 `TreeSet` 的结合体。 |
 
 ## 参考
 
-- Redis Data Structures ：https://redis.com/redis-enterprise/data-structures/ 。
-- Redis Commands ： https://redis.io/commands/ 。
-- Redis Data types tutorial：https://redis.io/docs/manual/data-types/data-types-tutorial/ 。
-- Redis 存储对象信息是用 Hash 还是 String : https://segmentfault.com/a/1190000040032006
+- Redis Data Structures：<https://redis.com/redis-enterprise/data-structures/> 。
+- Redis Commands：<https://redis.io/commands/> 。
+- Redis Data types tutorial：<https://redis.io/docs/manual/data-types/data-types-tutorial/> 。
+- Redis 存储对象信息是用 Hash 还是 String : <https://segmentfault.com/a/1190000040032006>
+
+<!-- @include: @article-footer.snippet.md -->

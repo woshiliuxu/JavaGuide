@@ -14,8 +14,8 @@ tag:
 
 方法的定义可能会用到 **参数**（有参的方法），参数在程序语言中分为：
 
-- **实参（实际参数，Arguments）** ：用于传递给函数/方法的参数，必须有确定的值。
-- **形参（形式参数，Parameters）** ：用于定义函数/方法，接收实参，不需要有确定的值。
+- **实参（实际参数，Arguments）**：用于传递给函数/方法的参数，必须有确定的值。
+- **形参（形式参数，Parameters）**：用于定义函数/方法，接收实参，不需要有确定的值。
 
 ```java
 String hello = "Hello!";
@@ -31,8 +31,8 @@ void sayHello(String str) {
 
 程序设计语言将实参传递给方法（或函数）的方式分为两种：
 
-- **值传递** ：方法接收的是实参值的拷贝，会创建副本。
-- **引用传递** ：方法接收的直接是实参所引用的对象在堆中的地址，不会创建副本，对形参的修改将影响到实参。
+- **值传递**：方法接收的是实参值的拷贝，会创建副本。
+- **引用传递**：方法接收的直接是实参所引用的对象在堆中的地址，不会创建副本，对形参的修改将影响到实参。
 
 很多程序设计语言（比如 C++、 Pascal )提供了两种参数传递的方式，不过，在 Java 中只有值传递。
 
@@ -40,7 +40,7 @@ void sayHello(String str) {
 
 **为什么说 Java 只有值传递呢？** 不需要太多废话，我通过 3 个例子来给大家证明。
 
-### 案例1：传递基本类型参数
+### 案例 1：传递基本类型参数
 
 代码：
 
@@ -64,7 +64,7 @@ public static void swap(int a, int b) {
 
 输出：
 
-```
+```plain
 a = 20
 b = 10
 num1 = 10
@@ -73,33 +73,33 @@ num2 = 20
 
 解析：
 
-在 `swap()`  方法中，`a`、`b` 的值进行交换，并不会影响到 `num1`、`num2`。因为，`a`、`b` 的值，只是从 `num1`、`num2` 的复制过来的。也就是说，a、b 相当于 `num1`、`num2` 的副本，副本的内容无论怎么修改，都不会影响到原件本身。
+在 `swap()` 方法中，`a`、`b` 的值进行交换，并不会影响到 `num1`、`num2`。因为，`a`、`b` 的值，只是从 `num1`、`num2` 的复制过来的。也就是说，a、b 相当于 `num1`、`num2` 的副本，副本的内容无论怎么修改，都不会影响到原件本身。
 
 ![](https://oss.javaguide.cn/github/javaguide/java/basis/java-value-passing-01.png)
 
-通过上面例子，我们已经知道了一个方法不能修改一个基本数据类型的参数，而对象引用作为参数就不一样，请看案例2。
+通过上面例子，我们已经知道了一个方法不能修改一个基本数据类型的参数，而对象引用作为参数就不一样，请看案例 2。
 
-### 案例2：传递引用类型参数1
+### 案例 2：传递引用类型参数 1
 
 代码：
 
 ```java
-	public static void main(String[] args) {
+  public static void main(String[] args) {
       int[] arr = { 1, 2, 3, 4, 5 };
       System.out.println(arr[0]);
       change(arr);
       System.out.println(arr[0]);
-	}
+  }
 
-	public static void change(int[] array) {
+  public static void change(int[] array) {
       // 将数组的第一个元素变为0
       array[0] = 0;
-	}
+  }
 ```
 
 输出：
 
-```
+```plain
 1
 0
 ```
@@ -116,7 +116,7 @@ num2 = 20
 
 为了更强有力地反驳 Java 对引用类型的参数采用的不是引用传递，我们再来看下面这个案例！
 
-### 案例3 ：传递引用类型参数2
+### 案例 3：传递引用类型参数 2
 
 ```java
 public class Person {
@@ -141,9 +141,9 @@ public static void swap(Person person1, Person person2) {
 }
 ```
 
-输出: 
+输出:
 
-```
+```plain
 person1:小李
 person2:小张
 xiaoZhang:小张
@@ -177,13 +177,14 @@ int main()
 {
     int age = 10;
     std::cout << "invoke before: " << age << "\n";
-    incr(*age);
+    incr(age);
     std::cout << "invoke after: " << age << "\n";
 }
 ```
 
 输出结果：
-```
+
+```plain
 invoke before: 10
 incr before: 10
 incr after: 11
@@ -203,7 +204,7 @@ invoke after: 11
 
 ## 总结
 
-Java 中将实参传递给方法（或函数）的方式是 **值传递** ：
+Java 中将实参传递给方法（或函数）的方式是 **值传递**：
 
 - 如果参数是基本类型的话，很简单，传递的就是基本类型的字面量值的拷贝，会创建副本。
 - 如果参数是引用类型，传递的就是实参所引用的对象在堆中地址值的拷贝，同样也会创建副本。
@@ -211,6 +212,8 @@ Java 中将实参传递给方法（或函数）的方式是 **值传递** ：
 ## 参考
 
 - 《Java 核心技术卷 Ⅰ》基础知识第十版第四章 4.5 小节
-- [Java 到底是值传递还是引用传递？ - Hollis的回答 - 知乎](https://www.zhihu.com/question/31203609/answer/576030121) 
+- [Java 到底是值传递还是引用传递？ - Hollis 的回答 - 知乎](https://www.zhihu.com/question/31203609/answer/576030121)
 - [Oracle Java Tutorials - Passing Information to a Method or a Constructor](https://docs.oracle.com/javase/tutorial/java/javaOO/arguments.html)
 - [Interview with James Gosling, Father of Java](https://mappingthejourney.com/single-post/2017/06/29/episode-3-interview-with-james-gosling-father-of-java/)
+
+<!-- @include: @article-footer.snippet.md -->

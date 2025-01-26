@@ -9,12 +9,12 @@ head:
       content: MySQL查询缓存,MySQL缓存机制中的内存管理
   - - meta
     - name: description
-      content: 为了提高完全相同的查询语句的响应速度，MySQL Server 会对查询语句进行 Hash 计算得到一个 Hash 值。MySQL Server 不会对 SQL 做任何处理，SQL 必须完全一致 Hash 值才会一样。得到 Hash 值之后，通过该 Hash 值到查询缓存中匹配该查询的结果。MySQL 中的查询缓存虽然能够提升数据库的查询性能，但是查询同时也带来了额外的开销，每次查询后都要做一次缓存操作，失效后还要销毁。 
+      content: 为了提高完全相同的查询语句的响应速度，MySQL Server 会对查询语句进行 Hash 计算得到一个 Hash 值。MySQL Server 不会对 SQL 做任何处理，SQL 必须完全一致 Hash 值才会一样。得到 Hash 值之后，通过该 Hash 值到查询缓存中匹配该查询的结果。MySQL 中的查询缓存虽然能够提升数据库的查询性能，但是查询同时也带来了额外的开销，每次查询后都要做一次缓存操作，失效后还要销毁。
 ---
 
 缓存是一个有效且实用的系统性能优化的手段，不论是操作系统还是各种软件和网站或多或少都用到了缓存。
 
-然而，有经验的 DBA 都建议生产环境中把 MySQL 自带的 Query Cache（查询缓存）给关掉。而且，从 MySQL 5.7.20 开始，就已经默认弃用查询缓存了。在 MySQL 8.0及之后，更是直接删除了查询缓存的功能。
+然而，有经验的 DBA 都建议生产环境中把 MySQL 自带的 Query Cache（查询缓存）给关掉。而且，从 MySQL 5.7.20 开始，就已经默认弃用查询缓存了。在 MySQL 8.0 及之后，更是直接删除了查询缓存的功能。
 
 这又是为什么呢？查询缓存真就这么鸡肋么?
 
@@ -27,7 +27,7 @@ head:
 
 ## MySQL 查询缓存介绍
 
-MySQL体系架构如下图所示：
+MySQL 体系架构如下图所示：
 
 ![](https://oss.javaguide.cn/github/javaguide/mysql/mysql-architecture.png)
 
@@ -80,7 +80,7 @@ mysql> show variables like '%query_cache%';
 - **`query_cache_min_res_unit`：** 查询缓存分配的最小块的大小(字节)。当查询进行的时候，MySQL 把查询结果保存在查询缓存中，但如果要保存的结果比较大，超过 `query_cache_min_res_unit` 的值 ，这时候 MySQL 将一边检索结果，一边进行保存结果，也就是说，有可能在一次查询中，MySQL 要进行多次内存分配的操作。适当的调节 `query_cache_min_res_unit` 可以优化内存。
 - **`query_cache_size`：** 为缓存查询结果分配的内存的数量，单位是字节，且数值必须是 1024 的整数倍。默认值是 0，即禁用查询缓存。
 - **`query_cache_type`：** 设置查询缓存类型，默认为 ON。设置 GLOBAL 值可以设置后面的所有客户端连接的类型。客户端可以设置 SESSION 值以影响他们自己对查询缓存的使用。
-- **`query_cache_wlock_invalidate`** ：如果某个表被锁住，是否返回缓存中的数据，默认关闭，也是建议的。
+- **`query_cache_wlock_invalidate`**：如果某个表被锁住，是否返回缓存中的数据，默认关闭，也是建议的。
 
 `query_cache_type` 可能的值(修改 `query_cache_type` 需要重启 MySQL Server)：
 
@@ -88,12 +88,12 @@ mysql> show variables like '%query_cache%';
 - 1 或 ON：开启查询缓存功能，但不缓存 `Select SQL_NO_CACHE` 开头的查询。
 - 2 或 DEMAND：开启查询缓存功能，但仅缓存 `Select SQL_CACHE` 开头的查询。
 
-**建议** ：
+**建议**：
 
-- `query_cache_size`不建议设置的过大。过大的空间不但挤占实例其他内存结构的空间，而且会增加在缓存中搜索的开销。建议根据实例规格，初始值设置为10MB到100MB之间的值，而后根据运行使用情况调整。
+- `query_cache_size`不建议设置的过大。过大的空间不但挤占实例其他内存结构的空间，而且会增加在缓存中搜索的开销。建议根据实例规格，初始值设置为 10MB 到 100MB 之间的值，而后根据运行使用情况调整。
 - 建议通过调整 `query_cache_size` 的值来开启、关闭查询缓存，因为修改`query_cache_type` 参数需要重启 MySQL Server 生效。
 
-8.0 版本之前，`my.cnf` 加入以下配置，重启 MySQL 开启查询缓存
+  8.0 版本之前，`my.cnf` 加入以下配置，重启 MySQL 开启查询缓存
 
 ```properties
 query_cache_type=1
@@ -109,7 +109,7 @@ set global  query_cache_size=600000;
 
 手动清理缓存可以使用下面三个 SQL：
 
-- `flush query cache;` ：清理查询缓存内存碎片。
+- `flush query cache;`：清理查询缓存内存碎片。
 - `reset query cache;`：从查询缓存中移除所有查询。
 - `flush tables；` 关闭所有打开的表，同时该操作会清空查询缓存中的内容。
 
@@ -128,7 +128,7 @@ set global  query_cache_size=600000;
 - 缓存建立之后，MySQL 的查询缓存系统会跟踪查询中涉及的每张表，如果这些表（数据或结构）发生变化，那么和这张表相关的所有缓存数据都将失效。
 - MySQL 缓存在分库分表环境下是不起作用的。
 - 不缓存使用 `SQL_NO_CACHE` 的查询。
-- ......
+- ……
 
 查询缓存 `SELECT` 选项示例：
 
@@ -151,7 +151,7 @@ MySQL 查询缓存使用内存池技术，自己管理内存释放和分配，�
 
 ## MySQL 查询缓存的优缺点
 
-**优点：** 
+**优点：**
 
 - 查询缓存的查询，发生在 MySQL 接收到客户端的查询请求、查询权限验证之后和查询 SQL 解析之前。也就是说，当 MySQL 接收到客户端的查询 SQL 之后，仅仅只需要对其进行相应的权限验证之后，就会通过查询缓存来查找结果，甚至都不需要经过 Optimizer 模块进行执行计划的分析优化，更不需要发生任何存储引擎的交互。
 - 由于查询缓存是基于内存的，直接从内存中返回相应的查询结果，因此减少了大量的磁盘 I/O 和 CPU 计算，导致效率非常高。
@@ -174,7 +174,7 @@ MySQL 查询缓存使用内存池技术，自己管理内存释放和分配，�
 
 ## 总结
 
-MySQL 中的查询缓存虽然能够提升数据库的查询性能，但是查询同时也带来了额外的开销，每次查询后都要做一次缓存操作，失效后还要销毁。 
+MySQL 中的查询缓存虽然能够提升数据库的查询性能，但是查询同时也带来了额外的开销，每次查询后都要做一次缓存操作，失效后还要销毁。
 
 查询缓存是一个适用较少情况的缓存机制。如果你的应用对数据库的更新很少，那么查询缓存将会作用显著。比较典型的如博客系统，一般博客更新相对较慢，数据表相对稳定不变，这时候查询缓存的作用会比较明显。
 
@@ -196,11 +196,13 @@ MySQL 中的查询缓存虽然能够提升数据库的查询性能，但是查�
 
 > 根据我们的经验，在高并发压力环境中查询缓存会导致系统性能的下降，甚至僵死。如果你一 定要使用查询缓存，那么不要设置太大内存，而且只有在明确收益的时候才使用（数据库内容修改次数较少）。
 
-**确实是这样的！实际项目中，更建议使用本地缓存（比如 Caffeine）或者分布式缓存（比如Redis） ，性能更好，更通用一些。**
+**确实是这样的！实际项目中，更建议使用本地缓存（比如 Caffeine）或者分布式缓存（比如 Redis） ，性能更好，更通用一些。**
 
 ## 参考
 
 - 《高性能 MySQL》
-- MySQL缓存机制：https://zhuanlan.zhihu.com/p/55947158
-- RDS MySQL查询缓存（Query Cache）的设置和使用 - 阿里元云数据库 RDS 文档:https://help.aliyun.com/document_detail/41717.html
-- 8.10.3 The MySQL Query Cache - MySQL 官方文档：https://dev.mysql.com/doc/refman/5.7/en/query-cache.html
+- MySQL 缓存机制：<https://zhuanlan.zhihu.com/p/55947158>
+- RDS MySQL 查询缓存（Query Cache）的设置和使用 - 阿里元云数据库 RDS 文档:<https://help.aliyun.com/document_detail/41717.html>
+- 8.10.3 The MySQL Query Cache - MySQL 官方文档：<https://dev.mysql.com/doc/refman/5.7/en/query-cache.html>
+
+<!-- @include: @article-footer.snippet.md -->

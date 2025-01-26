@@ -1,5 +1,5 @@
 ---
-title: ZooKeeper 相关概念总结(入门)
+title: ZooKeeper相关概念总结(入门)
 category: 分布式
 tag:
   - ZooKeeper
@@ -39,7 +39,7 @@ _如果文章有任何需要改善和完善的地方，欢迎在评论区指出�
 
 ZooKeeper 是一个开源的**分布式协调服务**，它的设计目标是将那些复杂且容易出错的分布式一致性服务封装起来，构成一个高效可靠的原语集，并以一系列简单易用的接口提供给用户使用。
 
-> **原语：** 操作系统或计算机网络用语范畴。是由若干条指令组成的，用于完成一定功能的一个过程。具有不可分割性·即原语的执行必须是连续的，在执行过程中不允许被中断。
+> **原语：** 操作系统或计算机网络用语范畴。是由若干条指令组成的，用于完成一定功能的一个过程。具有不可分割性，即原语的执行必须是连续的，在执行过程中不允许被中断。
 
 ZooKeeper 为我们提供了高可用、高性能、稳定的分布式数据一致性解决方案，通常被用于实现诸如数据发布/订阅、负载均衡、命名服务、分布式协调/通知、集群管理、Master 选举、分布式锁和分布式队列等功能。这些功能的实现主要依赖于 ZooKeeper 提供的 **数据存储+事件监听** 功能（后文会详细介绍到） 。
 
@@ -55,8 +55,11 @@ ZooKeeper 将数据保存在内存中，性能是不错的。 在“读”多于
 
 - **顺序一致性：** 从同一客户端发起的事务请求，最终将会严格地按照顺序被应用到 ZooKeeper 中去。
 - **原子性：** 所有事务请求的处理结果在整个集群中所有机器上的应用情况是一致的，也就是说，要么整个集群中所有的机器都成功应用了某一个事务，要么都没有应用。
-- **单一系统映像 ：** 无论客户端连到哪一个 ZooKeeper 服务器上，其看到的服务端数据模型都是一致的。
+- **单一系统映像：** 无论客户端连到哪一个 ZooKeeper 服务器上，其看到的服务端数据模型都是一致的。
 - **可靠性：** 一旦一次更改请求被应用，更改的结果就会被持久化，直到被下一次更改覆盖。
+- **实时性：** 一旦数据发生变更，其他节点会实时感知到。每个客户端的系统视图都是最新的。
+- **集群部署**：3~5 台（最好奇数台）机器就可以组成一个集群，每台机器都在内存保存了 ZooKeeper 的全部数据，机器之间互相通信同步数据，客户端连接任何一台机器都可以。
+- **高可用：**如果某台机器宕机，会保证数据不丢失。集群中挂掉不超过一半的机器，都能保证集群可用。比如 3 台机器可以挂 1 台，5 台机器可以挂 2 台。
 
 ### ZooKeeper 应用场景
 
@@ -64,9 +67,9 @@ ZooKeeper 概览中，我们介绍到使用其通常被用于实现诸如数据�
 
 下面选 3 个典型的应用场景来专门说说：
 
-1. **命名服务** ：可以通过 ZooKeeper 的顺序节点生成全局唯一 ID。
-2. **数据发布/订阅** ：通过 **Watcher 机制** 可以很方便地实现数据发布/订阅。当你将数据发布到 ZooKeeper 被监听的节点上，其他机器可通过监听 ZooKeeper 上节点的变化来实现配置的动态更新。
-3. **分布式锁** ： 通过创建唯一节点获得分布式锁，当获得锁的一方执行完相关代码或者是挂掉之后就释放锁。分布式锁的实现也需要用到 **Watcher 机制** ，我在 [分布式锁详解](https://javaguide.cn/distributed-system/distributed-lock.html) 这篇文章中有详细介绍到如何基于 ZooKeeper 实现分布式锁。
+1. **命名服务**：可以通过 ZooKeeper 的顺序节点生成全局唯一 ID。
+2. **数据发布/订阅**：通过 **Watcher 机制** 可以很方便地实现数据发布/订阅。当你将数据发布到 ZooKeeper 被监听的节点上，其他机器可通过监听 ZooKeeper 上节点的变化来实现配置的动态更新。
+3. **分布式锁**：通过创建唯一节点获得分布式锁，当获得锁的一方执行完相关代码或者是挂掉之后就释放锁。分布式锁的实现也需要用到 **Watcher 机制** ，我在 [分布式锁详解](https://javaguide.cn/distributed-system/distributed-lock.html) 这篇文章中有详细介绍到如何基于 ZooKeeper 实现分布式锁。
 
 实际上，这些功能的实现基本都得益于 ZooKeeper 可以保存数据的功能，但是 ZooKeeper 不适合保存大量数据，这一点需要注意。
 
@@ -76,9 +79,9 @@ _破音：拿出小本本，下面的内容非常重要哦！_
 
 ### Data model（数据模型）
 
-ZooKeeper 数据模型采用层次化的多叉树形结构，每个节点上都可以存储数据，这些数据可以是数字、字符串或者是二级制序列。并且。每个节点还可以拥有 N 个子节点，最上层是根节点以“/”来代表。每个数据节点在 ZooKeeper 中被称为 **znode**，它是 ZooKeeper 中数据的最小单元。并且，每个 znode 都一个唯一的路径标识。
+ZooKeeper 数据模型采用层次化的多叉树形结构，每个节点上都可以存储数据，这些数据可以是数字、字符串或者是二进制序列。并且。每个节点还可以拥有 N 个子节点，最上层是根节点以“/”来代表。每个数据节点在 ZooKeeper 中被称为 **znode**，它是 ZooKeeper 中数据的最小单元。并且，每个 znode 都有一个唯一的路径标识。
 
-强调一句：**ZooKeeper 主要是用来协调服务的，而不是用来存储业务数据的，所以不要放比较大的数据在 znode 上，ZooKeeper 给出的上限是每个结点的数据大小最大是 1M。**
+强调一句：**ZooKeeper 主要是用来协调服务的，而不是用来存储业务数据的，所以不要放比较大的数据在 znode 上，ZooKeeper 给出的每个节点的数据大小上限是 1M 。**
 
 从下图可以更直观地看出：ZooKeeper 节点路径标识方式和 Unix 文件系统路径非常相似，都是由一系列使用斜杠"/"进行分割的路径表示，开发人员可以向这个节点中写入数据，也可以在节点下面创建子节点。这些操作我们后面都会介绍到。
 
@@ -90,15 +93,15 @@ ZooKeeper 数据模型采用层次化的多叉树形结构，每个节点上都�
 
 我们通常是将 znode 分为 4 大类：
 
-- **持久（PERSISTENT）节点** ：一旦创建就一直存在即使 ZooKeeper 集群宕机，直到将其删除。
-- **临时（EPHEMERAL）节点** ：临时节点的生命周期是与 **客户端会话（session）** 绑定的，**会话消失则节点消失** 。并且，**临时节点只能做叶子节点** ，不能创建子节点。
-- **持久顺序（PERSISTENT_SEQUENTIAL）节点** ：除了具有持久（PERSISTENT）节点的特性之外， 子节点的名称还具有顺序性。比如 `/node1/app0000000001` 、`/node1/app0000000002` 。
-- **临时顺序（EPHEMERAL_SEQUENTIAL）节点** ：除了具备临时（EPHEMERAL）节点的特性之外，子节点的名称还具有顺序性
+- **持久（PERSISTENT）节点**：一旦创建就一直存在即使 ZooKeeper 集群宕机，直到将其删除。
+- **临时（EPHEMERAL）节点**：临时节点的生命周期是与 **客户端会话（session）** 绑定的，**会话消失则节点消失**。并且，**临时节点只能做叶子节点** ，不能创建子节点。
+- **持久顺序（PERSISTENT_SEQUENTIAL）节点**：除了具有持久（PERSISTENT）节点的特性之外， 子节点的名称还具有顺序性。比如 `/node1/app0000000001`、`/node1/app0000000002` 。
+- **临时顺序（EPHEMERAL_SEQUENTIAL）节点**：除了具备临时（EPHEMERAL）节点的特性之外，子节点的名称还具有顺序性
 
 每个 znode 由 2 部分组成:
 
-- **stat** ：状态信息
-- **data** ： 节点存放的数据的具体内容
+- **stat**：状态信息
+- **data**：节点存放的数据的具体内容
 
 如下所示，我通过 get 命令来获取 根目录下的 dubbo 节点的内容。（get 命令在下面会介绍到）。
 
@@ -122,29 +125,29 @@ numChildren = 1
 
 Stat 类中包含了一个数据节点的所有状态信息的字段，包括事务 ID（cZxid）、节点创建时间（ctime） 和子节点个数（numChildren） 等等。
 
-下面我们来看一下每个 znode 状态信息究竟代表的是什么吧！（下面的内容来源于《从 Paxos 到 ZooKeeper 分布式一致性原理与实践》，因为 Guide 确实也不是特别清楚，要学会参考资料的嘛！ ） ：
+下面我们来看一下每个 znode 状态信息究竟代表的是什么吧！（下面的内容来源于《从 Paxos 到 ZooKeeper 分布式一致性原理与实践》，因为 Guide 确实也不是特别清楚，要学会参考资料的嘛！ ）：
 
-| znode 状态信息 | 解释                                                         |
-| -------------- | ------------------------------------------------------------ |
-| cZxid          | create ZXID，即该数据节点被创建时的事务 id                   |
-| ctime          | create time，即该节点的创建时间                              |
-| mZxid          | modified ZXID，即该节点最终一次更新时的事务 id               |
-| mtime          | modified time，即该节点最后一次的更新时间                    |
+| znode 状态信息 | 解释                                                                                                |
+| -------------- | --------------------------------------------------------------------------------------------------- |
+| cZxid          | create ZXID，即该数据节点被创建时的事务 id                                                          |
+| ctime          | create time，即该节点的创建时间                                                                     |
+| mZxid          | modified ZXID，即该节点最终一次更新时的事务 id                                                      |
+| mtime          | modified time，即该节点最后一次的更新时间                                                           |
 | pZxid          | 该节点的子节点列表最后一次修改时的事务 id，只有子节点列表变更才会更新 pZxid，子节点内容变更不会更新 |
-| cversion       | 子节点版本号，当前节点的子节点每次变化时值增加 1             |
-| dataVersion    | 数据节点内容版本号，节点创建时为 0，每更新一次节点内容(不管内容有无变化)该版本号的值增加 1 |
-| aclVersion     | 节点的 ACL 版本号，表示该节点 ACL 信息变更次数               |
-| ephemeralOwner | 创建该临时节点的会话的 sessionId；如果当前节点为持久节点，则 ephemeralOwner=0 |
-| dataLength     | 数据节点内容长度                                             |
-| numChildren    | 当前节点的子节点个数                                         |
+| cversion       | 子节点版本号，当前节点的子节点每次变化时值增加 1                                                    |
+| dataVersion    | 数据节点内容版本号，节点创建时为 0，每更新一次节点内容(不管内容有无变化)该版本号的值增加 1          |
+| aclVersion     | 节点的 ACL 版本号，表示该节点 ACL 信息变更次数                                                      |
+| ephemeralOwner | 创建该临时节点的会话的 sessionId；如果当前节点为持久节点，则 ephemeralOwner=0                       |
+| dataLength     | 数据节点内容长度                                                                                    |
+| numChildren    | 当前节点的子节点个数                                                                                |
 
 ### 版本（version）
 
 在前面我们已经提到，对应于每个 znode，ZooKeeper 都会为其维护一个叫作 **Stat** 的数据结构，Stat 中记录了这个 znode 的三个相关的版本：
 
-- **dataVersion** ：当前 znode 节点的版本号
-- **cversion** ： 当前 znode 子节点的版本
-- **aclVersion** ： 当前 znode 的 ACL 的版本。
+- **dataVersion**：当前 znode 节点的版本号
+- **cversion**：当前 znode 子节点的版本
+- **aclVersion**：当前 znode 的 ACL 的版本。
 
 ### ACL（权限控制）
 
@@ -153,7 +156,7 @@ ZooKeeper 采用 ACL（AccessControlLists）策略来进行权限控制，类似
 对于 znode 操作的权限，ZooKeeper 提供了以下 5 种：
 
 - **CREATE** : 能创建子节点
-- **READ** ：能获取节点数据和列出其子节点
+- **READ**：能获取节点数据和列出其子节点
 - **WRITE** : 能设置/更新节点数据
 - **DELETE** : 能删除子节点
 - **ADMIN** : 能设置节点 ACL 的权限
@@ -162,9 +165,9 @@ ZooKeeper 采用 ACL（AccessControlLists）策略来进行权限控制，类似
 
 对于身份认证，提供了以下几种方式：
 
-- **world** ： 默认方式，所有用户都可无条件访问。
+- **world**：默认方式，所有用户都可无条件访问。
 - **auth** :不使用任何 id，代表任何已认证的用户。
-- **digest** :用户名:密码认证方式： _username:password_ 。
+- **digest** :用户名:密码认证方式：_username:password_ 。
 - **ip** : 对指定 ip 进行限制。
 
 ### Watcher（事件监听器）
@@ -191,7 +194,7 @@ Session 有一个属性叫做：`sessionTimeout` ，`sessionTimeout` 代表会�
 
 上图中每一个 Server 代表一个安装 ZooKeeper 服务的服务器。组成 ZooKeeper 服务的服务器都会在内存中维护当前的服务器状态，并且每台服务器之间都互相保持着通信。集群间通过 ZAB 协议（ZooKeeper Atomic Broadcast）来保持数据的一致性。
 
-**最典型集群模式： Master/Slave 模式（主备模式）**。在这种模式中，通常 Master 服务器作为主服务器提供写服务，其他的 Slave 服务器从服务器通过异步复制的方式获取 Master 服务器最新的数据提供读服务。
+**最典型集群模式：Master/Slave 模式（主备模式）**。在这种模式中，通常 Master 服务器作为主服务器提供写服务，其他的 Slave 服务器从服务器通过异步复制的方式获取 Master 服务器最新的数据提供读服务。
 
 ### ZooKeeper 集群角色
 
@@ -201,10 +204,10 @@ Session 有一个属性叫做：`sessionTimeout` ，`sessionTimeout` 代表会�
 
 ZooKeeper 集群中的所有机器通过一个 **Leader 选举过程** 来选定一台称为 “**Leader**” 的机器，Leader 既可以为客户端提供写服务又能提供读服务。除了 Leader 外，**Follower** 和 **Observer** 都只能提供读服务。Follower 和 Observer 唯一的区别在于 Observer 机器不参与 Leader 的选举过程，也不参与写操作的“过半写成功”策略，因此 Observer 机器可以在不影响写性能的情况下提升集群的读性能。
 
-| 角色     | 说明                                                         |
-| -------- | ------------------------------------------------------------ |
-| Leader   | 为客户端提供读和写的服务，负责投票的发起和决议，更新系统状态。 |
-| Follower | 为客户端提供读服务，如果是写服务则转发给 Leader。参与选举过程中的投票。 |
+| 角色     | 说明                                                                                                                                                                              |
+| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Leader   | 为客户端提供读和写的服务，负责投票的发起和决议，更新系统状态。                                                                                                                    |
+| Follower | 为客户端提供读服务，如果是写服务则转发给 Leader。参与选举过程中的投票。                                                                                                           |
 | Observer | 为客户端提供读服务，如果是写服务则转发给 Leader。不参与选举过程中的投票，也不参与“过半写成功”策略。在不影响写性能的情况下提升集群的读性能。此角色于 ZooKeeper3.3 系列新增的角色。 |
 
 ### ZooKeeper 集群 Leader 选举过程
@@ -214,16 +217,16 @@ ZooKeeper 集群中的所有机器通过一个 **Leader 选举过程** 来选定
 这个过程大致是这样的：
 
 1. **Leader election（选举阶段）**：节点在一开始都处于选举阶段，只要有一个节点得到超半数节点的票数，它就可以当选准 leader。
-2. **Discovery（发现阶段）** ：在这个阶段，followers 跟准 leader 进行通信，同步 followers 最近接收的事务提议。
-3. **Synchronization（同步阶段）** :同步阶段主要是利用 leader 前一阶段获得的最新提议历史，同步集群中所有的副本。同步完成之后准 leader 才会成为真正的 leader。
-4. **Broadcast（广播阶段）** :到了这个阶段，ZooKeeper 集群才能正式对外提供事务服务，并且 leader 可以进行消息广播。同时如果有新的节点加入，还需要对新节点进行同步。
+2. **Discovery（发现阶段）**：在这个阶段，followers 跟准 leader 进行通信，同步 followers 最近接收的事务提议。
+3. **Synchronization（同步阶段）**：同步阶段主要是利用 leader 前一阶段获得的最新提议历史，同步集群中所有的副本。同步完成之后准 leader 才会成为真正的 leader。
+4. **Broadcast（广播阶段）**：到了这个阶段，ZooKeeper 集群才能正式对外提供事务服务，并且 leader 可以进行消息广播。同时如果有新的节点加入，还需要对新节点进行同步。
 
 ZooKeeper 集群中的服务器状态有下面几种：
 
-- **LOOKING** ：寻找 Leader。
-- **LEADING** ：Leader 状态，对应的节点为 Leader。
-- **FOLLOWING** ：Follower 状态，对应的节点为 Follower。
-- **OBSERVING** ：Observer 状态，对应节点为 Observer，该节点不参与 Leader 选举。
+- **LOOKING**：寻找 Leader。
+- **LEADING**：Leader 状态，对应的节点为 Leader。
+- **FOLLOWING**：Follower 状态，对应的节点为 Follower。
+- **OBSERVING**：Observer 状态，对应节点为 Observer，该节点不参与 Leader 选举。
 
 ### ZooKeeper 集群为啥最好奇数台？
 
@@ -252,20 +255,49 @@ Paxos 算法应该可以说是 ZooKeeper 的灵魂了。但是，ZooKeeper 并�
 
 ### ZAB 协议介绍
 
-ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服务 ZooKeeper 专门设计的一种支持崩溃恢复的原子广播协议。 在 ZooKeeper 中，主要依赖 ZAB 协议来实现分布式数据一致性，基于该协议，ZooKeeper 实现了一种主备模式的系统架构来保持集群中各个副本之间的数据一致性。
+ZAB（ZooKeeper Atomic Broadcast，原子广播） 协议是为分布式协调服务 ZooKeeper 专门设计的一种支持崩溃恢复的原子广播协议。 在 ZooKeeper 中，主要依赖 ZAB 协议来实现分布式数据一致性，基于该协议，ZooKeeper 实现了一种主备模式的系统架构来保持集群中各个副本之间的数据一致性。
 
 ### ZAB 协议两种基本的模式：崩溃恢复和消息广播
 
 ZAB 协议包括两种基本的模式，分别是
 
-- **崩溃恢复** ：当整个服务框架在启动过程中，或是当 Leader 服务器出现网络中断、崩溃退出与重启等异常情况时，ZAB 协议就会进入恢复模式并选举产生新的 Leader 服务器。当选举产生了新的 Leader 服务器，同时集群中已经有过半的机器与该 Leader 服务器完成了状态同步之后，ZAB 协议就会退出恢复模式。其中，**所谓的状态同步是指数据同步，用来保证集群中存在过半的机器能够和 Leader 服务器的数据状态保持一致**。
-- **消息广播** ：**当集群中已经有过半的 Follower 服务器完成了和 Leader 服务器的状态同步，那么整个服务框架就可以进入消息广播模式了。** 当一台同样遵守 ZAB 协议的服务器启动后加入到集群中时，如果此时集群中已经存在一个 Leader 服务器在负责进行消息广播，那么新加入的服务器就会自觉地进入数据恢复模式：找到 Leader 所在的服务器，并与其进行数据同步，然后一起参与到消息广播流程中去。
+- **崩溃恢复**：当整个服务框架在启动过程中，或是当 Leader 服务器出现网络中断、崩溃退出与重启等异常情况时，ZAB 协议就会进入恢复模式并选举产生新的 Leader 服务器。当选举产生了新的 Leader 服务器，同时集群中已经有过半的机器与该 Leader 服务器完成了状态同步之后，ZAB 协议就会退出恢复模式。其中，**所谓的状态同步是指数据同步，用来保证集群中存在过半的机器能够和 Leader 服务器的数据状态保持一致**。
+- **消息广播**：**当集群中已经有过半的 Follower 服务器完成了和 Leader 服务器的状态同步，那么整个服务框架就可以进入消息广播模式了。** 当一台同样遵守 ZAB 协议的服务器启动后加入到集群中时，如果此时集群中已经存在一个 Leader 服务器在负责进行消息广播，那么新加入的服务器就会自觉地进入数据恢复模式：找到 Leader 所在的服务器，并与其进行数据同步，然后一起参与到消息广播流程中去。
+
+### ZAB 协议&Paxos 算法文章推荐
 
 关于 **ZAB 协议&Paxos 算法** 需要讲和理解的东西太多了，具体可以看下面这几篇文章：
 
-- [Paxos 算法详解](https://javaguide.cn/distributed-system/theorem&algorithm&protocol/paxos-algorithm.html)
-- [Zookeeper ZAB 协议分析](https://dbaplus.cn/news-141-1875-1.html)
-- [Raft 算法详解](https://javaguide.cn/distributed-system/theorem&algorithm&protocol/raft-algorithm.html)
+- [Paxos 算法详解](https://javaguide.cn/distributed-system/protocol/paxos-algorithm.html)
+- [ZooKeeper 与 Zab 协议 · Analyze](https://wingsxdu.com/posts/database/zookeeper/)
+- [Raft 算法详解](https://javaguide.cn/distributed-system/protocol/raft-algorithm.html)
+
+## ZooKeeper VS ETCD
+
+[ETCD](https://etcd.io/) 是一种强一致性的分布式键值存储，它提供了一种可靠的方式来存储需要由分布式系统或机器集群访问的数据。ETCD 内部采用 [Raft 算法](https://javaguide.cn/distributed-system/protocol/raft-algorithm.html)作为一致性算法，基于 Go 语言实现。
+
+与 ZooKeeper 类似，ETCD 也可用于数据发布/订阅、负载均衡、命名服务、分布式协调/通知、分布式锁等场景。那二者如何选择呢？
+
+得物技术的[浅析如何基于 ZooKeeper 实现高可用架构](https://mp.weixin.qq.com/s/pBI3rjv5NdS1124Z7HQ-JA)这篇文章给出了如下的对比表格（我进一步做了优化），可以作为参考：
+
+|                  | ZooKeeper                                                             | ETCD                                                   |
+| ---------------- | --------------------------------------------------------------------- | ------------------------------------------------------ |
+| **语言**         | Java                                                                  | Go                                                     |
+| **协议**         | TCP                                                                   | Grpc                                                   |
+| **接口调用**     | 必须要使用自己的 client 进行调用                                      | 可通过 HTTP 传输，即可通过 CURL 等命令实现调用         |
+| **一致性算法**   | Zab 协议                                                              | Raft 算法                                              |
+| **Watcher 机制** | 较局限，一次性触发器                                                  | 一次 Watch 可以监听所有的事件                          |
+| **数据模型**     | 基于目录的层次模式                                                    | 参考了 zk 的数据模型，是个扁平的 kv 模型               |
+| **存储**         | kv 存储，使用的是 ConcurrentHashMap，内存存储，一般不建议存储较多数据 | kv 存储，使用 bbolt 存储引擎，可以处理几个 GB 的数据。 |
+| **MVCC**         | 不支持                                                                | 支持，通过两个 B+ Tree 进行版本控制                    |
+| **全局 Session** | 存在缺陷                                                              | 实现更灵活，避免了安全性问题                           |
+| **权限校验**     | ACL                                                                   | RBAC                                                   |
+| **事务能力**     | 提供了简易的事务能力                                                  | 只提供了版本号的检查能力                               |
+| **部署维护**     | 复杂                                                                  | 简单                                                   |
+
+ZooKeeper 在存储性能、全局 Session、Watcher 机制等方面存在一定局限性，越来越多的开源项目在替换 ZooKeeper 为 Raft 实现或其它分布式协调服务，例如：[Kafka Needs No Keeper - Removing ZooKeeper Dependency (confluent.io)](https://www.confluent.io/blog/removing-zookeeper-dependency-in-kafka/)、[Moving Toward a ZooKeeper-Less Apache Pulsar (streamnative.io)](https://streamnative.io/blog/moving-toward-zookeeper-less-apache-pulsar)。
+
+ETCD 相对来说更优秀一些，提供了更稳定的高负载读写能力，对 ZooKeeper 暴露的许多问题进行了改进优化。并且，ETCD 基本能够覆盖 ZooKeeper 的所有应用场景，实现对其的替代。
 
 ## 总结
 
@@ -279,3 +311,6 @@ ZAB 协议包括两种基本的模式，分别是
 ## 参考
 
 - 《从 Paxos 到 ZooKeeper 分布式一致性原理与实践》
+- 谈谈 ZooKeeper 的局限性：<https://wingsxdu.com/posts/database/zookeeper-limitations/>
+
+<!-- @include: @article-footer.snippet.md -->

@@ -17,7 +17,7 @@ tag:
 
 ![Github简历](https://oss.javaguide.cn/2020-11/image-20201108192205620.png)
 
-通过 https://www.githubtrends.io/wrapped 这个网站，你可以生成一份 Github 个人年报，这个年报会列举出你在这一年的项目贡献情况、最常使用的编程语言、详细的贡献信息。
+通过 <https://www.githubtrends.io/wrapped> 这个网站，你可以生成一份 Github 个人年报，这个年报会列举出你在这一年的项目贡献情况、最常使用的编程语言、详细的贡献信息。
 
 ![](https://oss.javaguide.cn/github/dootask/image-20211226144607457.png)
 
@@ -59,13 +59,13 @@ Github 目前支持在个人主页自定义展示一些内容。展示效果如�
 
 ![](https://oss.javaguide.cn/github/dootask/repobeats.png)
 
-地址：https://repobeats.axiom.co/ 。
+地址：<https://repobeats.axiom.co/> 。
 
 ## Github 表情
 
 ![Github表情](https://oss.javaguide.cn/2020-11/image-20201107162254582.png)
 
-如果你想要在 Github 使用表情的话，可以在这里找找 ：[www.webfx.com/tools/emoji-cheat-sheet/ ](www.webfx.com/tools/emoji-cheat-sheet/)。
+如果你想要在 Github 使用表情的话，可以在这里找找：[www.webfx.com/tools/emoji-cheat-sheet/](https://www.webfx.com/tools/emoji-cheat-sheet/)。
 
 ![在线Github表情](https://oss.javaguide.cn/2020-11/image-20201107162432941.png)
 
@@ -127,13 +127,13 @@ Github 前段时间推出的 Codespaces 可以提供类似 VS Code 的在线 IDE
 2. Githunb Topics 按照类别/话题将一些项目进行了分类汇总。比如 [Data visualization](https://github.com/topics/data-visualization) 汇总了数据可视化相关的一些开源项目，[Awesome Lists](https://github.com/topics/awesome) 汇总了 Awesome 系列的仓库；
 3. 通过 Github Trending 我们可以看到最近比较热门的一些开源项目，我们可以按照语言类型以及时间维度对项目进行筛选；
 4. Github Collections 类似一个收藏夹集合。比如 [Teaching materials for computational social science](https://github.com/collections/teaching-computational-social-science) 这个收藏夹就汇总了计算机课程相关的开源资源，[Learn to Code](https://github.com/collections/learn-to-code) 这个收藏夹就汇总了对你学习编程有帮助的一些仓库；
-5. ......
+5. ……
 
 ![](https://oss.javaguide.cn/github/javaguide/github-explore.png)
 
 ## GitHub Actions 很强大
 
-你可以简单地将 GitHub Actions 理解为 Github 自带的 CI/CD ，通过 GitHub Actions 你可以直接在 GitHub 构建、测试和部署代码，你还可以对代码进行审查、管理 API 、分析项目依赖项。总之，GitHub Actions 可以自动化地帮你完成很多事情。
+你可以简单地将 GitHub Actions 理解为 Github 自带的 CI/CD ，通过 GitHub Actions 你可以直接在 GitHub 构建、测试和部署代码，你还可以对代码进行审查、管理 API、分析项目依赖项。总之，GitHub Actions 可以自动化地帮你完成很多事情。
 
 关于 GitHub Actions 的详细介绍，推荐看一下阮一峰老师写的 [GitHub Actions 入门教程](https://www.ruanyifeng.com/blog/2019/09/getting-started-with-github-actions.html) 。
 
@@ -146,3 +146,5 @@ GitHub Actions 有一个官方市场，上面有非常多别人提交的 Actions
 这一篇文章，我毫无保留地把自己这些年总结的 Github 小技巧分享了出来，真心希望对大家有帮助，真心希望大家一定要利用好 Github 这个专属程序员的宝藏。
 
 另外，这篇文章中，我并没有提到 Github 搜索技巧。在我看来，Github 搜索技巧不必要记网上那些文章说的各种命令啥的，真没啥卵用。你会发现你用的最多的还是关键字搜索以及 Github 自带的筛选功能。
+
+<!-- @include: @article-footer.snippet.md -->

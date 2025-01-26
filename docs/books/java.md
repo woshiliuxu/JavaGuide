@@ -6,7 +6,7 @@ icon: "java"
 
 ## Java 基础
 
-**[《Head First Java》](https://book.douban.com/subject/2000732/)** 
+**[《Head First Java》](https://book.douban.com/subject/2000732/)**
 
 ![《Head First Java》-豆瓣](https://oss.javaguide.cn/github/javaguide/books/image-20220424103035793.png)
 
@@ -18,7 +18,7 @@ icon: "java"
 
 我个人觉得这本书还是挺适合编程新手阅读的，毕竟是 “Head First” 系列。
 
-**[《Java 核心技术卷 1+卷 2》](https://book.douban.com/subject/34898994/)** 
+**[《Java 核心技术卷 1 + 卷 2》](https://book.douban.com/subject/34898994/)**
 
 ![《Java 核心技术卷 1》-豆瓣](https://oss.javaguide.cn/github/javaguide/books/image-20220424101217849.png)
 
@@ -26,19 +26,27 @@ icon: "java"
 
 我当时在大学的时候就买了两本放在寝室，没事的时候就翻翻。建议有点 Java 基础之后再读，介绍的还是比较深入和全面的，非常推荐。
 
-**[《Java 编程思想》](https://book.douban.com/subject/2130190/)** 
+**[《Java 编程思想》](https://book.douban.com/subject/2130190/)**
 
 ![《Java 编程思想》-豆瓣](https://oss.javaguide.cn/github/javaguide/books/image-20220424103124893.png)
 
-这本书被很多人称之为 Java 领域的圣经（_感觉有点过了~~~_）。不太推荐编程初学者阅读，有点劝退的味道，稍微有点基础后阅读更好。
+另外，这本书的作者去年新出版了[《On Java》](https://book.douban.com/subject/35751619/)，我更推荐这本，内容更新，介绍了 Java 的 3 个长期支持版（Java 8、11、17）。
 
-我第一次看的时候还觉得有点枯燥，那时候还在上大二，看了 1/3 就没看下去了。
+![](https://oss.javaguide.cn/github/javaguide/books/on-java/6171657600353_.pic_hd.jpg)
 
-**[《Java 8实战》](https://book.douban.com/subject/26772632/)**
+毕竟，这是市面上目前唯一一本介绍了 Java 的 3 个长期支持版（Java 8、11、17）的技术书籍。
+
+**[《Java 8 实战》](https://book.douban.com/subject/26772632/)**
 
 ![《Java 8实战》-豆瓣](https://oss.javaguide.cn/github/javaguide/books/image-20220424103202625.png)
 
 Java 8 算是一个里程碑式的版本，现在一般企业还是用 Java 8 比较多。掌握 Java 8 的一些新特性比如 Lambda、Stream API 还是挺有必要的。这块的话，我推荐 **[《Java 8 实战》](https://book.douban.com/subject/26772632/)** 这本书。
+
+**[《Java 编程的逻辑》](https://book.douban.com/subject/30133440/)**
+
+![《Java编程的逻辑》](https://oss.javaguide.cn/github/javaguide/books/image-20230721153650488.png)
+
+一本非常低调的好书，相比于入门书来说，内容更有深度。适合初学者，同时也适合大家拿来复习 Java 基础知识。
 
 ## Java 并发
 
@@ -46,7 +54,7 @@ Java 8 算是一个里程碑式的版本，现在一般企业还是用 Java 8 �
 
 ![《Java 并发编程之美》-豆瓣](https://oss.javaguide.cn/github/javaguide/books/image-20220424112413660.png)
 
-_这本书还是非常适合我们用来学习 Java 多线程的。这本书的讲解非常通俗易懂，作者从并发编程基础到实战都是信手拈来。_
+这本书还是非常适合我们用来学习 Java 多线程的，讲解非常通俗易懂，作者从并发编程基础到实战都是信手拈来。
 
 另外，这本书的作者加多自身也会经常在网上发布各种技术文章。这本书也是加多大佬这么多年在多线程领域的沉淀所得的结果吧！他书中的内容基本都是结合代码讲解，非常有说服力！
 
@@ -64,13 +72,11 @@ _这本书还是非常适合我们用来学习 Java 多线程的。这本书的�
 
 这本书的质量也是非常过硬！给作者们点个赞！这本书有统一的排版规则和语言风格、清晰的表达方式和逻辑。并且每篇文章初稿写完后，作者们就会互相审校，合并到主分支时所有成员会再次审校，最后再通篇修订了三遍。
 
-在线阅读：[https://redspider.gitbook.io/concurrent/](https://redspider.gitbook.io/concurrent/ ) 。
+在线阅读：<https://redspider.gitbook.io/concurrent/>。
 
 **[《Java 并发实现原理：JDK 源码剖析》](https://book.douban.com/subject/35013531/)**
 
 ![《Java 并发实现原理：JDK 源码剖析》-豆瓣](https://oss.javaguide.cn/github/javaguide/books/0b1b046af81f4c94a03e292e66dd6f7d.png)
-
-这本书是 2020 年新出的，所以，现在知道的人还不是很多。
 
 这本书主要是对 Java Concurrent 包中一些比较重要的源码进行了讲解，另外，像 JMM、happen-before、CAS 等等比较重要的并发知识这本书也都会一并介绍到。
 
@@ -78,7 +84,7 @@ _这本书还是非常适合我们用来学习 Java 多线程的。这本书的�
 
 ## JVM
 
-**[《深入理解 Java 虚拟机》](https://book.douban.com/subject/34907497/)** 
+**[《深入理解 Java 虚拟机》](https://book.douban.com/subject/34907497/)**
 
 ![《深入理解 Java 虚拟机》-豆瓣](https://oss.javaguide.cn/github/javaguide/books/20210710104655705.png)
 
@@ -122,12 +128,12 @@ _这本书还是非常适合我们用来学习 Java 多线程的。这本书的�
 
 非常重要！非常重要！特别是 Git 和 Docker。
 
-- **IDEA** ：熟悉基本操作以及常用快捷。你可以通过 Github 上的开源教程 [《IntelliJ IDEA 简体中文专题教程》](https://github.com/judasn/IntelliJ-IDEA-Tutorial) 来学习 IDEA 的使用。
-- **Maven** ：强烈建议学习常用框架之前可以提前花几天时间学习一下**Maven**的使用。（到处找 Jar 包，下载 Jar 包是真的麻烦费事，使用 Maven 可以为你省很多事情）。
-- **Git** ：基本的 Git 技能也是必备的，试着在学习的过程中将自己的代码托管在 Github 上。你可以看看这篇 Github 上开源的 [《Git 极简入门》](https://snailclimb.gitee.io/javaguide/#/docs/tools/Git) 。
-- **Docker** ：学着用 Docker 安装学习中需要用到的软件比如 MySQL ,这样方便很多，可以为你节省不少时间。你可以看看这篇 Github 上开源的 [《Docker 基本概念解读》](https://snailclimb.gitee.io/javaguide/#/docs/tools/Docker) 、[《一文搞懂 Docker 镜像的常用操作！》](https://snailclimb.gitee.io/javaguide/#/docs/tools/Docker-Image)
+- **IDEA**：熟悉基本操作以及常用快捷。相关资料： [《IntelliJ IDEA 简体中文专题教程》](https://github.com/judasn/IntelliJ-IDEA-Tutorial) 。
+- **Maven**：强烈建议学习常用框架之前可以提前花几天时间学习一下**Maven**的使用。（到处找 Jar 包，下载 Jar 包是真的麻烦费事，使用 Maven 可以为你省很多事情）。相关阅读：[Maven 核心概念总结](https://javaguide.cn/tools/maven/maven-core-concepts.html)。
+- **Git**：基本的 Git 技能也是必备的，试着在学习的过程中将自己的代码托管在 Github 上。相关阅读：[Git 核心概念总结](https://javaguide.cn/tools/git/git-intro.html)。
+- **Docker**：学着用 Docker 安装学习中需要用到的软件比如 MySQL ,这样方便很多，可以为你节省不少时间。相关资料：[《Docker - 从入门到实践》](https://yeasy.gitbook.io/docker_practice/) 。
 
-除了这些工具之外，我强烈建议你一定要搞懂 Github 的使用。一些使用 Github 的小技巧，你可以看[《Github 小技巧》](https://snailclimb.gitee.io/javaguide/#/docs/tools/Github%E6%8A%80%E5%B7%A7)这篇文章。
+除了这些工具之外，我强烈建议你一定要搞懂 GitHub 的使用。一些使用 GitHub 的小技巧，你可以看[Github 实用小技巧总结](https://javaguide.cn/tools/git/github-tips.html)这篇文章。
 
 ## 常用框架
 
@@ -171,13 +177,33 @@ SpringBoot 解析，不适合初学者。我是去年入手的，现在就看了
 
 比较一般的一本书，可以简单拿来看一下。
 
+### MyBatis
+
+MyBatis 国内用的挺多的，我的建议是不需要花太多时间在上面。当然了，MyBatis 的源码还是非常值得学习的，里面有很多不错的编码实践。这里推荐两本讲解 MyBatis 源码的书籍。
+
+**[《手写 MyBatis：渐进式源码实践》](https://book.douban.com/subject/36243250/)**
+
+![《手写MyBatis：渐进式源码实践》](https://oss.javaguide.cn/github/javaguide/books/image-20230724123402784.png)
+
+我的好朋友小傅哥出版的一本书。这本书以实践为核心，摒弃 MyBatis 源码中繁杂的内容，聚焦于 MyBaits 中的核心逻辑，简化代码实现过程，以渐进式的开发方式，逐步实现 MyBaits 中的核心功能。
+
+这本书的配套项目的仓库地址：<https://github.com/fuzhengwei/small-mybatis> 。
+
+**[《通用源码阅读指导书――MyBatis 源码详解》](https://book.douban.com/subject/35138963/)**
+
+![《通用源码阅读指导书――MyBatis源码详解》](https://oss.javaguide.cn/github/javaguide/books/image-20230724123416741.png)
+
+这本书通过 MyBatis 开源代码讲解源码阅读的流程和方法！一共对 MyBatis 源码中的 300 多个类进行了详细解析，包括其背景知识、组织方式、逻辑结构、实现细节。
+
+这本书的配套示例仓库地址：<https://github.com/yeecode/MyBatisDemo> 。
+
 ### Netty
 
 **[《Netty 实战》](https://book.douban.com/subject/27038538/)**
 
 ![《Netty 实战》-豆瓣](https://oss.javaguide.cn/github/javaguide/books/image-20220424113715369.png)
 
-这本书可以用来入门 Netty ，内容从 BIO 聊到了 NIO、之后才详细介绍为什么有 Netty 、Netty 为什么好用以及 Netty 重要的知识点讲解。
+这本书可以用来入门 Netty ，内容从 BIO 聊到了 NIO、之后才详细介绍为什么有 Netty、Netty 为什么好用以及 Netty 重要的知识点讲解。
 
 这本书基本把 Netty 一些重要的知识点都介绍到了，而且基本都是通过实战的形式讲解。
 
@@ -191,7 +217,7 @@ SpringBoot 解析，不适合初学者。我是去年入手的，现在就看了
 
 ![](https://oss.javaguide.cn/github/javaguide/open-source-project/image-20220503085034268.png)
 
-2022 年 3 月刚刚出版的一本书。这本书分为上下两篇，上篇通过一个即时聊天系统的实战案例带你入门 Netty，下篇通过 Netty 源码分析带你搞清 Netty 比较重要的底层原理。
+2022 年 3 月出版的一本书。这本书分为上下两篇，上篇通过一个即时聊天系统的实战案例带你入门 Netty，下篇通过 Netty 源码分析带你搞清 Netty 比较重要的底层原理。
 
 ## 性能调优
 
@@ -217,7 +243,7 @@ O'Reilly 家族书，性能调优的入门书，我个人觉得性能调优是�
 
 ![](https://oss.javaguide.cn/github/javaguide/books/20210412232441459.png)
 
-事务与锁、分布式（CAP、分布式事务......）、高并发、高可用 《软件架构设计：大型网站技术架构与业务架构融合之道》 这本书都有介绍到。
+事务与锁、分布式（CAP、分布式事务……）、高并发、高可用 《软件架构设计：大型网站技术架构与业务架构融合之道》 这本书都有介绍到。
 
 ## 面试
 
@@ -229,6 +255,6 @@ O'Reilly 家族书，性能调优的入门书，我个人觉得性能调优是�
 
 [JavaGuide](https://javaguide.cn/) 的面试版本，涵盖了 Java 后端方面的大部分知识点比如 集合、JVM、多线程还有数据库 MySQL 等内容。
 
-公众号后台回复 ：“**面试突击**” 即可免费获取，无任何套路。
+公众号后台回复：“**面试突击**” 即可免费获取，无任何套路。
 
 ![JavaGuide 官方公众号](https://oss.javaguide.cn/github/javaguide/gongzhonghaoxuanchuan.png)

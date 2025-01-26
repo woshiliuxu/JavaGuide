@@ -1,10 +1,11 @@
 ---
 title: 项目经验指南
 category: 面试准备
+icon: project
 ---
 
 ::: tip 友情提示
-本文节选自 **[《Java 面试指北》](../zhuanlan/java-mian-shi-zhi-bei.md)**。这是一份教你如何更高效地准备面试的小册，涵盖常见八股文（系统设计、常见框架、分布式、高并发 ......）、优质面经等内容。
+本文节选自 **[《Java 面试指北》](../zhuanlan/java-mian-shi-zhi-bei.md)**。这是一份教你如何更高效地准备面试的小册，涵盖常见八股文（系统设计、常见框架、分布式、高并发 ……）、优质面经等内容。
 :::
 
 ## 没有项目经验怎么办?
@@ -35,13 +36,13 @@ category: 面试准备
 
 ### 实战类开源项目
 
-Github 或者码云上面有很多实战类别项目，你可以选择一个来研究，为了让自己对这个项目更加理解，在理解原有代码的基础上，你可以对原有项目进行改进或者增加功能。
+GitHub 或者码云上面有很多实战类别项目，你可以选择一个来研究，为了让自己对这个项目更加理解，在理解原有代码的基础上，你可以对原有项目进行改进或者增加功能。
 
 你可以参考 [Java 优质开源实战项目](https://javaguide.cn/open-source-project/practical-project.html "Java 优质开源实战项目") 上面推荐的实战类开源项目，质量都很高，项目类型也比较全面，涵盖博客/论坛系统、考试/刷题系统、商城系统、权限管理系统、快速开发脚手架以及各种轮子。
 
 ![Java 优质开源实战项目](https://oss.javaguide.cn/javamianshizhibei/javaguide-practical-project.png)
 
-一定要记住： **不光要做，还要改进，改善。不论是实战项目视频或者专栏还是实战类开源项目，都一定会有很多可以完善改进的地方。**
+一定要记住：**不光要做，还要改进，改善。不论是实战项目视频或者专栏还是实战类开源项目，都一定会有很多可以完善改进的地方。**
 
 ### 从头开始做
 
@@ -53,7 +54,7 @@ Github 或者码云上面有很多实战类别项目，你可以选择一个来�
 
 如果参加这种赛事能获奖的话，项目含金量非常高。即使没获奖也没啥，也可以写简历上。
 
-![阿里云天池大赛](https://oscimg.oschina.net/oscnet/up-673f598477242691900a1e72c5d8b26df2c.png)
+![阿里云天池大赛](https://oss.javaguide.cn/xingqiu/up-673f598477242691900a1e72c5d8b26df2c.png)
 
 ### 参与实际项目
 
@@ -71,7 +72,7 @@ Github 或者码云上面有很多实战类别项目，你可以选择一个来�
 
 ## 有没有还不错的项目推荐？
 
- **[《Java 面试指北》](../zhuanlan/java-mian-shi-zhi-bei.md)** 的「面试准备篇」中有一篇文章专门整理了一些比较高质量的实战项目，非常适合用来学习或者作为项目经验。
+**[《Java 面试指北》](../zhuanlan/java-mian-shi-zhi-bei.md)** 的「面试准备篇」中有一篇文章专门整理了一些比较高质量的实战项目，非常适合用来学习或者作为项目经验。
 
 ![](https://oss.javaguide.cn/javamianshizhibei/project-experience-guide.png)
 
@@ -89,26 +90,25 @@ Github 或者码云上面有很多实战类别项目，你可以选择一个来�
 
 简单说几个比较容易的优化点：
 
-1. **全局异常处理** ：很多项目这方面都做的不是很好，可以参考我的这篇文章：[《使用枚举简单封装一个优雅的 Spring Boot 全局异常处理！》](https://mp.weixin.qq.com/s/Y4Q4yWRqKG_lw0GLUsY2qw) 来做优化。
-2. **项目的技术选型优化** ：比如使用 Guava 做本地缓存的地方可以换成 **Caffeine** 。Caffeine 的各方面的表现要更加好！再比如 Controller 层是否放了太多的业务逻辑。
-3. **数据库方面** ：数据库设计可否优化？索引是否使用使用正确？SQL 语句是否可以优化？是否需要进行读写分离？
-4. **缓存** ：项目有没有哪些数据是经常被访问的？是否引入缓存来提高响应速度？
-5. **安全** ： 项目是否存在安全问题？
-6. ......
+1. **全局异常处理**：很多项目这方面都做的不是很好，可以参考我的这篇文章：[《使用枚举简单封装一个优雅的 Spring Boot 全局异常处理！》](https://mp.weixin.qq.com/s/Y4Q4yWRqKG_lw0GLUsY2qw) 来做优化。
+2. **项目的技术选型优化**：比如使用 Guava 做本地缓存的地方可以换成 **Caffeine** 。Caffeine 的各方面的表现要更加好！再比如 Controller 层是否放了太多的业务逻辑。
+3. **数据库方面**：数据库设计可否优化？索引是否使用使用正确？SQL 语句是否可以优化？是否需要进行读写分离？
+4. **缓存**：项目有没有哪些数据是经常被访问的？是否引入缓存来提高响应速度？
+5. **安全**：项目是否存在安全问题？
+6. ……
 
-另外，我在星球分享过常见的性能优化方向实践案例，涉及到多线程、异步、索引、缓存等方向，强烈推荐你看看：https://t.zsxq.com/06EqfeMZZ 。
+另外，我在星球分享过常见的性能优化方向实践案例，涉及到多线程、异步、索引、缓存等方向，强烈推荐你看看：<https://t.zsxq.com/06EqfeMZZ> 。
 
 最后，**再给大家推荐一个 IDEA 优化代码的小技巧，超级实用！**
 
 分析你的代码：右键项目-> Analyze->Inspect Code
 
-![](https://oscimg.oschina.net/oscnet/up-651672bce128025a135c1536cd5dc00532e.png)
+![](https://oss.javaguide.cn/xingqiu/up-651672bce128025a135c1536cd5dc00532e.png)
 
 扫描完成之后，IDEA 会给出一些可能存在的代码坏味道比如命名问题。
 
-![](https://oscimg.oschina.net/oscnet/up-05c83b319941995b07c8020fddc57f26037.png)
+![](https://oss.javaguide.cn/xingqiu/up-05c83b319941995b07c8020fddc57f26037.png)
 
 并且，你还可以自定义检查规则。
 
-![](https://oscimg.oschina.net/oscnet/up-6b618ad3bad0bc3f76e6066d90c8cd2f255.png)
-
+![](https://oss.javaguide.cn/xingqiu/up-6b618ad3bad0bc3f76e6066d90c8cd2f255.png)
